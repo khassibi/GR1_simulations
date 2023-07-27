@@ -2,6 +2,7 @@
 
 ## graph_builder.py
 This contains the functions to create graphs given a GR1 product automaton. 
+The green arrows represent transitions taken by the environment, and the blue arrows represent transitions taken by the system.
 
 ## runner_blocker.py
 This is an example GR1 game that is visualized in [RunnerBlockerStatesExplained.jpeg]([url](https://github.com/khassibi/GR1_simulations/blob/master/RunnerBlockerStatesExplained.jpeg)https://github.com/khassibi/GR1_simulations/blob/master/RunnerBlockerStatesExplained.jpeg).
