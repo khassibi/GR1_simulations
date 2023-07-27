@@ -1,7 +1,6 @@
 import tulip as tlp
 from tulip.interfaces import omega as omega_int
-
-from tulip.interfaces import omega as omega_int
+from tulip import transys, abstract, spec, synth
 import graph_builder as gb
 import networkx as nx
 
@@ -56,6 +55,7 @@ def experiment():
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
     # Automaton class found in omega/omega/symbolic/temporal.py
     aut = omega_int._grspec_to_automaton(spec)
+    
     # Making a graph of the asynchronous GR(1) game.
     g1 = gb.game_graph(aut, env='env', sys='sys', qinit=aut.qinit)
     attributes = ['color', 'shape']
@@ -71,4 +71,3 @@ def experiment():
 
 if __name__ == "__main__":
     experiment()
-
