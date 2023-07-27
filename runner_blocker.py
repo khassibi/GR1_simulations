@@ -52,8 +52,8 @@ def experiment():
     specs.moore = True
     print(specs.pretty())
 
+    # Turning the specifications into an automaton
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
-    # Automaton class found in omega/omega/symbolic/temporal.py
     aut = omega_int._grspec_to_automaton(spec)
     
     # Making a graph of the asynchronous GR(1) game.
@@ -68,6 +68,10 @@ def experiment():
     h2, _ = gb._state_format_nx(g2, attributes)
     pd2 = nx.drawing.nx_pydot.to_pydot(h2)
     pd2.write_pdf('runner_blocker_states.pdf')
+
+    # Synthesize the controller
+    ctrl = tlp.synth.synthesize(specs, sys=sys)
+    assert ctrl is not None, 'unrealizable'
 
 if __name__ == "__main__":
     experiment()
