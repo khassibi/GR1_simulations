@@ -1,7 +1,7 @@
 import tulip as tlp
 from tulip.interfaces import omega as omega_int
 from tulip import transys, abstract, spec, synth
-import graph_builder as gb
+import visualization.graph_builder as gb
 import networkx as nx
 
 def experiment():
