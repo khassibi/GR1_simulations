@@ -1,6 +1,6 @@
 # GR1_simulations
 
-## graph_builder.py
+## visualization/graph_builder.py
 This module contains the functions to create graphs given a GR1 product automaton. 
 The green arrows represent transitions taken by the environment, and the blue arrows represent transitions taken by the system.
 
