@@ -3,6 +3,7 @@ from tulip.interfaces import omega as omega_int
 from tulip import transys, abstract, spec, synth
 from visualization import graph_builder as gb
 import networkx as nx
+from tulip.transys import machines
 
 def experiment():
     # You can find the explainations of the states at GR1_simulations/RunnerBlockerStatesExplained.jpeg
@@ -11,17 +12,19 @@ def experiment():
     # Making a finite transition system
     sys = tlp.transys.FTS()
 
-    sys.atomic_propositions.add_from({'a1', 'a2', 'a3', 'a4'})
-    sys.states.add('c1', ap={'a1'})
-    sys.states.add('c2', ap={'a2'})
-    sys.states.add('c3', ap={'a3'})
-    sys.states.add('c4', ap={'a4'})
+    sys.states.add_from(['c1', 'c2', 'c3', 'c4'])
     sys.states.initial.add('c1')  # start in state c1
 
     sys.transitions.add_comb({'c1'}, {'c2', 'c3'})
     sys.transitions.add_comb({'c2'}, {'c4'})
     sys.transitions.add_comb({'c3'}, {'c4'})
     sys.transitions.add_comb({'c4'}, {'c4'})
+
+    sys.atomic_propositions.add_from({'a1', 'a2', 'a3', 'a4'})
+    sys.states.add('c1', ap={'a1'})
+    sys.states.add('c2', ap={'a2'})
+    sys.states.add('c3', ap={'a3'})
+    sys.states.add('c4', ap={'a4'})
 
     # Specifications for the environment
 
@@ -72,6 +75,8 @@ def experiment():
     # Synthesize the controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
+
+    # machines.random_run(ctrl, N=10)
 
 if __name__ == "__main__":
     experiment()
