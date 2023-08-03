@@ -123,7 +123,7 @@ def _exist_forall_init(g, aut, umap, keys):
         visited = enum._add_to_visited(d, visited, aut)
     return queue, visited
 
-def game_graph(aut, env, sys, qinit='\A \A'):
+def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
     _aut = copy.copy(aut)
     _aut.moore = aut.moore
     _aut.varlist.update(
@@ -136,7 +136,10 @@ def game_graph(aut, env, sys, qinit='\A \A'):
         env=aut.action[env],
         sys=aut.action[sys])
     _aut.prime_varlists()
-    return _game_graph(_aut, qinit)
+    g = _game_graph(_aut, qinit)
+    if remove_deadends:
+        return _remove_deadends(g)
+    return g
 
 def _game_graph(aut, qinit):
     assert aut.action['sys'] != aut.false
@@ -229,6 +232,14 @@ def _game_graph(aut, qinit):
                     s=next_sys))
 
     return g
+
+def _remove_deadends(graph):
+    dead_ends = [1]
+    while dead_ends:
+        dead_ends = [node for node in graph.nodes() if graph.out_degree(node) == 0]
+        graph.remove_nodes_from(dead_ends)
+    return graph
+
 
 def state_graph(aut, env, sys, qinit='\A \A'):
     r"""Return enumerated graph with steps as edges.
