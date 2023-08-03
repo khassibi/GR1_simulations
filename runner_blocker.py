@@ -58,13 +58,21 @@ def experiment():
     # Turning the specifications into an automaton
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
     aut = omega_int._grspec_to_automaton(spec)
-    
-    # Making a graph of the asynchronous GR(1) game.
-    g1 = gb.game_graph(aut, env='env', sys='sys', qinit=aut.qinit)
+
+    # Graphing
     attributes = ['color', 'shape']
+
+    # Making a graph of the asynchronous GR(1) game with deadends.
+    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
+    h0 = gb._game_format_nx(g0, attributes)
+    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
+    pd0.write_pdf('runner_blocker/runner_blocker_game.pdf')
+    
+    # Making a graph of the asynchronous GR(1) game without deadends.
+    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
     h1 = gb._game_format_nx(g1, attributes)
     pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf('runner_blocker/runner_blocker_game.pdf')
+    pd1.write_pdf('runner_blocker/runner_blocker_game_no_deadends.pdf')
 
     # Making a graph pf the state transitions of the environment and system
     g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
