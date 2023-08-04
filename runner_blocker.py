@@ -66,19 +66,19 @@ def experiment():
     g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
     h0 = gb._game_format_nx(g0, attributes)
     pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf('runner_blocker/runner_blocker_game.pdf')
+    pd0.write_pdf('runner_blocker/game.pdf')
     
     # Making a graph of the asynchronous GR(1) game without deadends.
     g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
     h1 = gb._game_format_nx(g1, attributes)
     pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf('runner_blocker/runner_blocker_game_no_deadends.pdf')
+    pd1.write_pdf('runner_blocker/game_no_deadends.pdf')
 
     # Making a graph pf the state transitions of the environment and system
     g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
     h2, _ = gb._state_format_nx(g2, attributes)
     pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf('runner_blocker/runner_blocker_states.pdf')
+    pd2.write_pdf('runner_blocker/states.pdf')
 
     # Synthesize the controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)

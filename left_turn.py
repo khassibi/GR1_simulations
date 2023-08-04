@@ -1,0 +1,99 @@
+import tulip as tlp
+from tulip.interfaces import omega as omega_int
+from tulip import transys, abstract, spec, synth
+from visualization import graph_builder as gb
+import networkx as nx
+from tulip.transys import machines
+
+
+def experiment():
+    # System definition
+    sys = tlp.transys.FTS()
+
+    sys.atomic_propositions.add_from({'a4', 'a7', 'a8', 'a9'})
+    sys.states.add('c4', ap={'a4'})
+    sys.states.add('c7', ap={'a7'})
+    sys.states.add('c8', ap={'a8'})
+    sys.states.add('c9', ap={'a9'})
+    sys.states.initial.add('c7')    # start in state c7
+
+    sys.transitions.add_comb({'c7'}, {'c7', 'c8'})
+    sys.transitions.add_comb({'c8'}, {'c8', 'c4'})
+    ## Add remaining state transitions
+    sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
+    sys.transitions.add_comb({'c9'}, {'c9'}) # Should this transition exist
+
+    # Specifications for the environment
+
+    # Human vehicle dynamics
+    env_vars = {'vh': (2, 6)}
+    env_init = {'vh = 2'}
+    env_safe = {
+        'vh = 2 -> next(vh) = 2 | next(vh) = 3',
+        ## Add remaining human vehicle dynamics
+        'vh = 3 -> next(vh) = 3 | next(vh) = 4',
+        'vh = 4 -> next(vh) = 4 | next(vh) = 5',
+        'vh = 5 -> next(vh) = 5 | next(vh) = 6',
+        'vh = 6 -> next(vh) = 6' # Should I say always 6?
+    }
+    # QUESTION: should I use || instead of |?
+    env_prog = {'vh = 6'}
+
+    # Traffic light 
+    env_vars.update({'light': ["g", "y", "r"]})
+    env_init.update({'light = "g"'})
+    env_safe |= {
+        'light = "g" -> next(light = "y")',
+        ## Add remaining light dynamics
+        # 'light = "y" -> next(light = "y") | next(light = "r")',
+        # 'light = "r" -> next(light = "r")'
+        # 'light = "r" -> next(light = "r") | next(light = "g")| '
+        'light = "y" -> next(light = "r")',
+        'light = "r" -> next(light = "g")'
+    }
+    # env_prog = {'light = "r"'} # I added this because I think it should be there
+    # env_prog = {} 
+
+    # System variables and requirements
+    sys_vars = {}
+    sys_init = {}
+    sys_prog = {'a9'}
+    sys_safe = {'!(a4 & vh = 4)'}
+
+    specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
+                            env_safe, sys_safe, env_prog, sys_prog)
+    specs.qinit = '\E \A'
+    specs.moore = True
+    print(specs.pretty())
+
+    spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
+    # Automaton class found in omega/omega/symbolic/temporal.py
+    aut = omega_int._grspec_to_automaton(spec)
+
+    # Graphing
+    attributes = ['color', 'shape']
+    
+    # Making a graph of the asynchronous GR(1) game with deadends.
+    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
+    h0 = gb._game_format_nx(g0, attributes)
+    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
+    pd0.write_pdf('left_turn/game.pdf')
+
+    # Making a graph of the asynchronous GR(1) game without deadends.
+    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
+    h1 = gb._game_format_nx(g1, attributes)
+    pd1 = nx.drawing.nx_pydot.to_pydot(h1)
+    pd1.write_pdf('left_turn/game_no_deadends.pdf')
+
+    # Making a graph pf the state transitions of the environment and system
+    g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
+    h2, _ = gb._state_format_nx(g2, attributes)
+    pd2 = nx.drawing.nx_pydot.to_pydot(h2)
+    pd2.write_pdf('left_turn/states.pdf')
+
+    # Synthesize the controller
+    ctrl = tlp.synth.synthesize(specs, sys=sys)
+    assert ctrl is not None, 'unrealizable'
+
+if __name__ == "__main__":
+    experiment()
