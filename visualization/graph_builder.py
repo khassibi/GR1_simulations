@@ -8,6 +8,8 @@ import logging
 
 import networkx as nx
 
+from omega.games import gr1
+
 from omega.logic import syntax as stx
 from omega.symbolic import prime as prm
 from omega.symbolic import symbolic
@@ -126,6 +128,7 @@ def _exist_forall_init(g, aut, umap, keys):
 def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
     _aut = copy.copy(aut)
     _aut.moore = aut.moore
+    _aut.plus_one = aut.plus_one
     _aut.varlist.update(
         env=aut.varlist[env],
         sys=aut.varlist[sys])
@@ -142,6 +145,8 @@ def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
     return g
 
 def _game_graph(aut, qinit):
+    # winning_set, _, __ = gr1.solve_streett_game(aut)
+
     assert aut.action['sys'] != aut.false
     primed_vars = enum._primed_vars_per_quantifier(aut.varlist)
     vrs = set(aut.varlist['env']).union(aut.varlist['sys'])
@@ -268,6 +273,7 @@ def state_graph(aut, env, sys, qinit='\A \A'):
     """
     _aut = copy.copy(aut)
     _aut.moore = aut.moore
+    _aut.plus_one = aut.plus_one
     _aut.varlist.update(
         env=aut.varlist[env],
         sys=aut.varlist[sys])
