@@ -145,7 +145,7 @@ def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
     return g
 
 def _game_graph(aut, qinit):
-    # winning_set, _, __ = gr1.solve_streett_game(aut)
+    winning_set, _, __ = gr1.solve_streett_game(aut)
 
     assert aut.action['sys'] != aut.false
     primed_vars = enum._primed_vars_per_quantifier(aut.varlist)
@@ -167,6 +167,9 @@ def _game_graph(aut, qinit):
                   if key not in ['color', 'shape']}
         log.debug('at node: {d}'.format(d=values))
         assert set(values) == varnames, (values, varnames)
+        check_bdd = aut.let(values, winning_set)
+        if check_bdd == aut.false:
+            g.nodes[node]['color'] = 'red'
         u = aut.action['env']
         u = aut.let(values, u)
         # apply Mealy controller function
@@ -176,7 +179,7 @@ def _game_graph(aut, qinit):
         assert u != aut.false
         sys = aut.let(values, u)
         if sys == aut.false:
-            g.nodes[node]['color'] = 'red'
+        #     g.nodes[node]['color'] = 'red'
             continue
         for next_env in env_iter:
             log.debug('next_env: {r}'.format(r=next_env))
@@ -202,6 +205,9 @@ def _game_graph(aut, qinit):
             assert u == aut.true or u == aut.false
             # find or add node
             env_node, already_visited = _get_node({**d, **{'shape': 'box'}}, g, umap, keys)  # TODO: maybe I don't need to check to find the node
+            check_bdd = aut.let(d, winning_set)
+            if check_bdd == aut.false:
+                g.nodes[env_node]['color'] = 'red'
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
@@ -287,6 +293,8 @@ def state_graph(aut, env, sys, qinit='\A \A'):
     return _state_graph(_aut, qinit)
 
 def _state_graph(aut, qinit):
+    winning_set, _, __ = gr1.solve_streett_game(aut)
+
     assert aut.action['sys'] != aut.false
     primed_vars = enum._primed_vars_per_quantifier(aut.varlist)
     vrs = set(aut.varlist['env']).union(aut.varlist['sys'])
@@ -306,6 +314,9 @@ def _state_graph(aut, qinit):
                   if key not in ['color']}
         log.debug('at node: {d}'.format(d=values))
         assert set(values) == varnames, (values, varnames)
+        check_bdd = aut.let(values, winning_set)
+        if check_bdd == aut.false:
+            g.nodes[node]['color'] = 'red'
         u = aut.action['env']
         u = aut.let(values, u)
         # apply Mealy controller function
@@ -315,7 +326,7 @@ def _state_graph(aut, qinit):
         assert u != aut.false
         sys = aut.let(values, u)
         if sys == aut.false:
-            g.nodes[node]['color'] = 'red'
+            # g.nodes[node]['color'] = 'red'
             continue
         for next_env in env_iter:
             log.debug('next_env: {r}'.format(r=next_env))
@@ -341,6 +352,9 @@ def _state_graph(aut, qinit):
             assert u == aut.true or u == aut.false
             # find or add node
             env_node, already_visited = _get_node(d, g, umap, keys)
+            check_bdd = aut.let(d, winning_set)
+            if check_bdd == aut.false:
+                g.nodes[env_node]['color'] = 'red'
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
