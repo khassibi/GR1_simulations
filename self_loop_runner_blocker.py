@@ -6,6 +6,8 @@ import networkx as nx
 from tulip.transys import machines
 from omega.games import gr1
 
+from tulip import dumpsmach
+
 def experiment():
     # System definition
     # Making a finite transition system
@@ -33,8 +35,8 @@ def experiment():
     env_init = {'b = 2'}
     env_safe = {
         'b = 2 -> next(b) = 1 | next(b) = 3',
-        'b = 1 -> next(b) = 2',
-        'b = 3 -> next(b) = 2'
+        '(b = 1 | b = 3) -> next(b) = 2',
+        # 'b = 3 -> next(b) = 2'
     }
     env_prog = {}
 
@@ -43,10 +45,12 @@ def experiment():
     sys_init = {}
     sys_prog = {'a4'}
     sys_safe = {
-        # '!(a2 & b = 1)',
-        # '!(a3 & b = 3)'
+        # '!(a2 & next(b) = 1)',
+        # '!(a3 & next(b) = 3)',
         'b=1 -> !a2',
         'b=3 -> !a3'
+        # 'b=2 -> X(!(a3 | a2))'
+        # 'b=1 -> X(!a2)'
     }
 
     # Function found in tulip-control/tulip/spec/form.py
@@ -86,6 +90,10 @@ def experiment():
     # You do sys=sys or env=env when sys or env are FTS's
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
+
+    dumpsmach.write_python_case('self_loop_runner_blocker_controller.py', ctrl, classname="runner_ctrl")
+
+    machines.random_run(ctrl, N=10)
 
 if __name__ == "__main__":
     experiment()

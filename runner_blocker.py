@@ -37,15 +37,18 @@ def experiment():
         'b = 3 -> next(b) = 2'
     }
     env_prog = {}
-    # QUESTION: Is this how I make env_prog?
 
     # System variables and requirements
     sys_vars = {}
-    sys_init = {}
+    sys_init = {'a1'}
     sys_prog = {'a4'}
     sys_safe = {
         '!(a2 & b = 1)',
         '!(a3 & b = 3)'
+        # '!(a2 & next(b) = 1)',
+        # '!(a3 & next(b) = 3)',
+        # 'b=1 -> !a2',
+        # 'b=3 -> !a3'
     }
 
     # Function found in tulip-control/tulip/spec/form.py

@@ -211,7 +211,7 @@ def _game_graph(aut, qinit):
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
-            g.add_edge(node, env_node, key="env", color='green', label=c)
+            g.add_edge(node, env_node, key="env", color='orange', label=c)
             
             log.debug((
                 'next env: {e}\n'
@@ -358,7 +358,7 @@ def _state_graph(aut, qinit):
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
-            g.add_edge(node, env_node, key="env", color='green', label=c)
+            g.add_edge(node, env_node, key="env", color='orange', label=c)
             
             log.debug((
                 'next env: {e}\n'
