@@ -1,17 +1,44 @@
 import networkx as nx
 
+# def greedy_most_red(g):
+#     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
+#     transitions = dict()
+#     for env_node in env_nodes:
+#         env_actions = list(g.successors(env_node))
+#         if len(env_actions) > 0:
+#             num_red = (env_actions[0], 0)
+#         else:
+#             transitions[env_node] = -1
+#             continue
+#         for sys_node in env_actions:
+#             if 'color' in g[sys_node]:
+#                 transitions[env_node] = sys_node
+#                 break
+#             counter = 0
+#             for sys_action in list(g.successors(sys_node)):
+#                 if 'color' in g.nodes[sys_action]:
+#                     counter += 1
+#             if counter > num_red[1]:
+#                 num_red = (sys_node, counter)
+#         transitions[env_node] = num_red[0]
+#     return transitions
+
 def greedy_most_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
     for env_node in env_nodes:
-        env_actions = list(g.neighbors(env_node))
-        num_red = (env_actions[0], 0)
+        env_actions = list(g.successors(env_node))
+        if len(env_actions) > 0:
+            num_red = (env_actions[0], 0)
+        else:
+            transitions[env_node] = -1
+            continue
         for sys_node in env_actions:
             if 'color' in g[sys_node]:
                 transitions[env_node] = sys_node
                 break
             counter = 0
-            for sys_action in list(g.neighbors(sys_node)):
+            for sys_action in list(g.successors(sys_node)):
                 if 'color' in g.nodes[sys_action]:
                     counter += 1
             if counter > num_red[1]:
@@ -23,14 +50,14 @@ def greedy_percent_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
     for env_node in env_nodes:
-        env_actions = list(g.neighbors(env_node))
+        env_actions = list(g.successors(env_node))
         percent_red = (env_actions[0], 0)
         for sys_node in env_actions:
             if 'color' in g[sys_node]:
                 transitions[env_node] = sys_node
                 break
             counter = 0
-            sys_actions = list(g.neighbors(sys_node))
+            sys_actions = list(g.successors(sys_node))
             for sys_action in sys_actions:
                 if 'color' in g.nodes[sys_action]:
                     counter += 1
@@ -43,7 +70,7 @@ def BFS_most_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
     for env_node in env_nodes:
-        env_actions = list(g.neighbors(env_node))
+        env_actions = list(g.successors(env_node))
         num_red = (env_actions[0], 0)
         for sys_node in env_actions:
             bfs_edges = list(nx.bfs_edges(g, source=sys_node))
@@ -61,7 +88,7 @@ def BFS_percent_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
     for env_node in env_nodes:
-        env_actions = list(g.neighbors(env_node))
+        env_actions = list(g.successors(env_node))
         percent_red = (env_actions[0], 0)
         for sys_node in env_actions:
             bfs_edges = list(nx.bfs_edges(g, source=sys_node))
