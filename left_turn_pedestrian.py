@@ -5,6 +5,9 @@ from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
 
+from tulip import dumpsmach
+import pickle
+
 def experiment():
     # System definition
     # Making a finite transition system
@@ -23,7 +26,7 @@ def experiment():
     sys.transitions.add_comb({'c8'}, {'c8', 'c4'})
     ## Add remaining state transitions
     sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
-    sys.transitions.add_comb({'c9'}, {'c9'}) # Should this transition exist
+    sys.transitions.add_comb({'c9'}, {'c9'})
 
     # Specifications for the environment
 
@@ -62,12 +65,10 @@ def experiment():
         'light = "r" -> next(light = "r") | next(light = "g")'
         # 'light = "r" -> next(light = "g")'
     }
+    env_prog |= {'light = "g"'}
 
     env_safe |= {
-        '!(light = "y" & next(p = 4))',
-        '!(light = "r" & (next(p = 4) | next(p = 5)))',
-        '!(light = "r" & (vh = 4 | vh = 5))'
-        # QUESTION: Is this what I want it to be doing
+        '!(light = "r" & (vh = 4 | vh = 5 | p = 4 | p = 5))'
     }
 
     # System variables and requirements
@@ -90,7 +91,16 @@ def experiment():
     # Automaton class found in omega/omega/symbolic/temporal.py
     aut = omega_int._grspec_to_automaton(spec)
 
+    # Synthesizing system controller
+    ctrl = tlp.synth.synthesize(specs, sys=sys)
+    assert ctrl is not None, 'unrealizable'
+
+    # time, states = ctrl.run('Sinit')
+
+    dumpsmach.write_python_case('left_turn_pedestrian/controller.py', ctrl, classname="sys_ctrl")
+
     # Graphing
+    filename = "left_turn_pedestrian/graph"
     attributes = ['color', 'shape']
 
     # Making a graph of the asynchronous GR(1) game with deadends.
@@ -98,6 +108,8 @@ def experiment():
     h0 = gb._game_format_nx(g0, attributes)
     pd0 = nx.drawing.nx_pydot.to_pydot(h0)
     pd0.write_pdf('left_turn_pedestrian/game.pdf')
+    with open(filename, "wb") as file:
+        pickle.dump(g0, file)
 
     # Making a graph of the asynchronous GR(1) game without deadends.
     g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
@@ -110,11 +122,6 @@ def experiment():
     h2, _ = gb._state_format_nx(g2, attributes)
     pd2 = nx.drawing.nx_pydot.to_pydot(h2)
     pd2.write_pdf('left_turn_pedestrian/states.pdf')
-
-    ctrl = tlp.synth.synthesize(specs, sys=sys)
-    assert ctrl is not None, 'unrealizable'
-
-    # time, states = ctrl.run('Sinit')
 
 if __name__ == "__main__":
     experiment()
