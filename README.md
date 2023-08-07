@@ -2,7 +2,7 @@
 
 ## visualization/graph_builder.py
 This module contains the functions to create graphs given a GR1 product automaton. 
-The green arrows represent transitions taken by the environment, and the blue arrows represent transitions taken by the system.
+The orange arrows represent transitions taken by the environment, and the blue arrows represent transitions taken by the system.
 
 ## runner_blocker.py
 This is an example GR1 game that is visualized in runner_blocker/RunnerBlockerStatesExplained.jpeg.
