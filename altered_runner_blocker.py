@@ -67,7 +67,7 @@ def experiment():
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
     aut = omega_int._grspec_to_automaton(spec)
 
-    path = 'altered_runner_blocker/'
+    path = 'dead_end_runner_blocker/'
     attributes = ['color', 'shape']
 
     # Making a graph of the asynchronous GR(1) game with deadends.
