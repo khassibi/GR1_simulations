@@ -80,5 +80,5 @@ def BFS_percent_red(g):
                 if 'color' in g.nodes[node]:
                     counter += 1
             percent_red[sys_node] = counter / len(bfs_nodes)
-        transitions[env_node] = [(sys_node, percent_red[sys_node]) for sys_node in env_actions if percent_red[sys_node] == max(percent_red.values())]
+        transitions[env_node] = [sys_node for sys_node in env_actions if percent_red[sys_node] == max(percent_red.values())]
     return transitions
