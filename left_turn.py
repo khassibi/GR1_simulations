@@ -84,6 +84,8 @@ def experiment():
     # Synthesize the controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
+    with open(path + "/ctrl", "wb") as file:
+        pickle.dump(ctrl, file)
 
     dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
 

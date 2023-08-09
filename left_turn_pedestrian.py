@@ -9,6 +9,8 @@ from tulip import dumpsmach
 import pickle
 
 def experiment():
+    path = 'left_turn_pedestrian/'
+
     # System definition
     # Making a finite transition system
     sys = tlp.transys.FTS()
@@ -94,22 +96,22 @@ def experiment():
     # Synthesizing system controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
-    with open("left_turn_pedestrian/ctrl", "wb") as file:
+    with open(path + "/ctrl", "wb") as file:
         pickle.dump(ctrl, file)
 
     # time, states = ctrl.run('Sinit')
 
-    dumpsmach.write_python_case('left_turn_pedestrian/controller.py', ctrl, classname="sys_ctrl")
+    dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
 
     # Graphing
-    filename = "left_turn_pedestrian/graph"
+    filename = path + "graph"
     attributes = ['color', 'shape']
 
     # Making a graph of the asynchronous GR(1) game with deadends.
     g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
     h0 = gb._game_format_nx(g0, attributes)
     pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf('left_turn_pedestrian/game.pdf')
+    pd0.write_pdf(path + 'game.pdf')
     with open(filename, "wb") as file:
         pickle.dump(g0, file)
 
@@ -117,13 +119,13 @@ def experiment():
     g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
     h1 = gb._game_format_nx(g1, attributes)
     pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf('left_turn_pedestrian/game_no_deadends.pdf')
+    pd1.write_pdf(path + 'game_no_deadends.pdf')
 
     # Making a graph pf the state transitions of the environment and system
     g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
     h2, _ = gb._state_format_nx(g2, attributes)
     pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf('left_turn_pedestrian/states.pdf')
+    pd2.write_pdf(path + 'states.pdf')
 
 if __name__ == "__main__":
     experiment()
