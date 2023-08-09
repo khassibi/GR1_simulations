@@ -55,6 +55,7 @@ def experiment():
     specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
     specs.qinit = '\E \A'
+    # try different moore and mealy and try different qinits
     specs.moore = True
     print(specs.pretty())
 

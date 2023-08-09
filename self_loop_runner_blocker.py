@@ -91,9 +91,9 @@ def experiment():
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
 
-    dumpsmach.write_python_case('self_loop_runner_blocker_controller.py', ctrl, classname="runner_ctrl")
+    dumpsmach.write_python_case('self_loop_runner_blocker/controller.py', ctrl, classname="sys_ctrl")
 
-    machines.random_run(ctrl, N=10)
+    # machines.random_run(ctrl, N=10)
 
 if __name__ == "__main__":
     experiment()

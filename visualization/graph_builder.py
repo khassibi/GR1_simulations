@@ -179,7 +179,7 @@ def _game_graph(aut, qinit):
         assert u != aut.false
         sys = aut.let(values, u)
         if sys == aut.false:
-        #     g.nodes[node]['color'] = 'red'
+            # g.nodes[node]['color'] = 'pink'
             continue
         for next_env in env_iter:
             log.debug('next_env: {r}'.format(r=next_env))
@@ -189,8 +189,10 @@ def _game_graph(aut, qinit):
             env_values = {unprime_vars[var]: value
                           for var, value in next_env.items()}
             v = aut.let(env_values, visited)
+            # v, _ = enum._select_candidate_nodes(
+            #     u, v, aut, visited=True)  # u is the next nodes and v is the visited nodes
             v, _ = enum._select_candidate_nodes(
-                u, v, aut, visited=True)  # u is the next nodes and v is the visited nodes
+                u, v, aut, visited=False)  # TODO: See how visited=True/False differ
             sys_iter = aut.pick_iter(
                 v, care_vars=aut.varlist['sys'])
 
@@ -227,6 +229,9 @@ def _game_graph(aut, qinit):
                 assert u == aut.true or u == aut.false
                 # find or add node
                 sys_node, already_visited = _get_node({**d, **{'shape': 'oval'}}, g, umap, keys)  # TODO: maybe I don't need to check to find the node
+                check_bdd = aut.let(d, winning_set)
+                if check_bdd == aut.false:
+                    g.nodes[sys_node]['color'] = 'red'
                 if not already_visited:
                     visited = enum._add_to_visited(d, visited, aut)
                 # Add a system node to the queue as long as the transition to it is unique
@@ -234,7 +239,6 @@ def _game_graph(aut, qinit):
                     c = remove_redundant_propositions(next_sys)
                     g.add_edge(env_node, sys_node, key="sys", color='blue', label=c)
                     queue.append(sys_node)
-                # TODO: Make squares system and circles the environment and have separate nodes from which each player does an action
 
                 log.debug((
                     'next env: {e}\n'
@@ -374,6 +378,9 @@ def _state_graph(aut, qinit):
                 assert u == aut.true or u == aut.false
                 # find or add node
                 sys_node, already_visited = _get_node(d, g, umap, keys)
+                check_bdd = aut.let(d, winning_set)
+                if check_bdd == aut.false:
+                    g.nodes[sys_node]['color'] = 'red'
                 if not already_visited:
                     visited = enum._add_to_visited(d, visited, aut)
                 # Add a system node to the queue as long as the transition to it is unique
