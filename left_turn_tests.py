@@ -112,6 +112,10 @@ def experiment():
     vh_signal, light_signal = test(G, 0, hardest_tests.greedy_percent_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
+    title = "Greedy Min Robustness"
+    vh_signal, light_signal = test(G, 0, hardest_tests.greedy_min_robustness, 20)
+    animate_test(ctrl, vh_signal, light_signal, title)
+
     title = "BFS Most Red"
     vh_signal, light_signal = test(G, 0, hardest_tests.BFS_most_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
