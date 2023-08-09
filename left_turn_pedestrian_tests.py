@@ -59,6 +59,21 @@ def test(G, init_node, test, max_runs):
     
     return vh_signal, p_signal, light_signal
 
+def animate_test(ctrl, vh_signal, p_signal, light_signal, title):
+    time, states = ctrl.run('Sinit', {'light': light_signal, 'vh': vh_signal, 
+                                      'p': p_signal})
+
+    # Grab the location
+    va_path = states['loc']
+    vh_path = ['c'+str(i) for i in vh_signal]
+    p_path = ['c'+str(i) for i in p_signal]
+    light_path = light_signal
+
+    # Animate the results
+    anim = animate.animate_intersection(light_path, (va_path, vh_path, p_path),
+                                        title)
+    anim.save(path + title + '.gif')
+
 def experiment():
     # Load the graph from the saved file
     with open(path + 'graph', "rb") as file:
@@ -87,6 +102,12 @@ def experiment():
                 unsafe_env_nodes.add(node)
     G.remove_nodes_from(unsafe_env_nodes)
 
+    # Relabeling the nodes in order
+    nodes = list(G.nodes)
+    new_labels = list(range(len(nodes)))
+    mapping = dict(zip(nodes, new_labels))
+    G = nx.relabel_nodes(G, mapping)
+
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Most Red"
@@ -107,21 +128,6 @@ def experiment():
     vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_percent_red, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    
-def animate_test(ctrl, vh_signal, p_signal, light_signal, title):
-    time, states = ctrl.run('Sinit', {'light': light_signal, 'vh': vh_signal, 
-                                      'p': p_signal})
-
-    # Grab the location
-    va_path = states['loc']
-    vh_path = ['c'+str(i) for i in vh_signal]
-    p_path = ['c'+str(i) for i in p_signal]
-    light_path = light_signal
-
-    # Animate the results
-    anim = animate.animate_intersection(light_path, (va_path, vh_path, p_path),
-                                        title)
-    anim.save(path + title + '.gif')
 
 if __name__ == "__main__":
     experiment()
