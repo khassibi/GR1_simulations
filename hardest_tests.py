@@ -43,6 +43,41 @@ def greedy_percent_red(g):
         transitions[env_node] = [sys_node for sys_node in env_actions if percent_red[sys_node] == max(percent_red.values())]
     return transitions
 
+# Robustness: phi_r(s) is the length of the minimal path from s to any unsafe state
+def _robustness(g):
+    shortest_paths = dict(nx.all_pairs_shortest_path_length(g))
+    sys_nodes = [node for node in g.nodes if 'box' in g.nodes[node]['shape']]
+    red_nodes = [node for node in g.nodes if 'color' in g.nodes[node]]
+    
+    robustness = dict()
+    total_nodes = len(g.nodes)
+    for sys_node in sys_nodes:
+        robustness[sys_node] = total_nodes
+        for red_node in red_nodes:
+            if red_node in shortest_paths[sys_node]:
+                if (shortest_paths[sys_node])[red_node] < robustness[sys_node]:
+                    robustness[sys_node] = (shortest_paths[sys_node])[red_node]
+    return robustness
+
+def greedy_min_robustness(g):
+    # For each environment node, find its robustness
+    # Choose transitions in this way
+    # TODO: Probably have to code a liveness condition 
+    robustness = _robustness(g)
+    env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
+    transitions = dict()
+    for env_node in env_nodes:
+        env_actions = list(g.successors(env_node))
+        transitions[env_node] = []
+        min_robustness = len(g.nodes)
+        for env_action in env_actions:
+            if robustness[env_action] == min_robustness:
+                transitions[env_node].append(env_action)
+            elif robustness[env_action] < min_robustness:
+                min_robustness = robustness[env_action]
+                transitions[env_node] = [env_action]
+    return transitions
+
 def BFS_most_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
