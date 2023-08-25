@@ -144,3 +144,6 @@ def experiment():
         pickle.dump(ctrl, file)
 
     dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
+
+if __name__ == "__main__":
+    experiment()
