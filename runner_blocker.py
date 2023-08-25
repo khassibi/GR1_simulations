@@ -5,7 +5,11 @@ from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
 
+from tulip import dumpsmach
+import pickle
+
 def experiment():
+    path = 'runner_blocker/'
     # You can find the explainations of the states at GR1_simulations/RunnerBlockerStatesExplained.jpeg
 
     # System definition
@@ -62,30 +66,37 @@ def experiment():
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
     aut = omega_int._grspec_to_automaton(spec)
 
+    # Synthesize the controller
+    ctrl = tlp.synth.synthesize(specs, sys=sys)
+    assert ctrl is not None, 'unrealizable'
+    with open(path + "/ctrl", "wb") as file:
+        pickle.dump(ctrl, file)
+
+    dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
+
     # Graphing
+    filename = path + "graph"
     attributes = ['color', 'shape']
 
     # Making a graph of the asynchronous GR(1) game with deadends.
     g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
     h0 = gb._game_format_nx(g0, attributes)
     pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf('runner_blocker/game.pdf')
+    pd0.write_pdf(path + 'game.pdf')
+    with open(filename, "wb") as file:
+        pickle.dump(g0, file)
     
     # Making a graph of the asynchronous GR(1) game without deadends.
     g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
     h1 = gb._game_format_nx(g1, attributes)
     pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf('runner_blocker/game_no_deadends.pdf')
+    pd1.write_pdf(path + 'game_no_deadends.pdf')
 
     # Making a graph pf the state transitions of the environment and system
     g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
     h2, _ = gb._state_format_nx(g2, attributes)
     pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf('runner_blocker/states.pdf')
-
-    # Synthesize the controller
-    ctrl = tlp.synth.synthesize(specs, sys=sys)
-    assert ctrl is not None, 'unrealizable'
+    pd2.write_pdf(path + 'states.pdf')
 
     # machines.random_run(ctrl, N=10)
 
