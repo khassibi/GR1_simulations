@@ -54,9 +54,8 @@ def experiment():
     # Function found in tulip-control/tulip/spec/form.py
     specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
-    specs.qinit = '\E \A'
-    # try different moore and mealy and try different qinits
-    specs.moore = True
+    specs.qinit = '\A \E'
+    specs.moore = False
     print(specs.pretty())
 
     # Turning the specifications into an automaton
