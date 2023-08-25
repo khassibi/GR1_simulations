@@ -39,8 +39,6 @@ def experiment():
                     'til_C4': (-1,1),
                     'til_C7': (-1,1)})
     sys_vars.update({'t1': (0,5),
-                    't2': (0,5),
-                    't3': (0,5),
                     't4': (0,5)})
     
     # Time considerations
@@ -96,14 +94,6 @@ def experiment():
     sys_safe.update({'(B1 = 0) -> (next(t1) = (t1 + 1))',
                     '(B1 = 1) -> (next(t1) = 0)',
                     't1 <= 5'})
-    # B2
-    sys_safe.update({'(B2 = 0) -> (next(t2) = (t2 + 1))',
-                    '(B2 = 1) -> (next(t2) = 0)',
-                    't2 <= 5'})
-    # B3
-    sys_safe.update({'(B3 = 0) -> (next(t3) = (t3 + 1))',
-                    '(B3 = 1) -> (next(t3) = 0)',
-                    't3 <= 5'})
     # B4
     sys_safe.update({'(B4 = 0) -> (next(t4) = (t4 + 1))',
                     '(B4 = 1) -> (next(t4) = 0)',
@@ -122,7 +112,7 @@ def experiment():
                     '((GR = 0) & (AR = 1)) -> (til_C5 = 1)'})
     
     # Other system specifications
-    sys_init = {'(C1 = 1) & (C2 = 0) & (C5 = 0) & (C6 = 1) & (C3 = 1) & (C4 = 0) & (C7 = -1) & (til_C1 = 1) & (til_C2 = 0) & (til_C5 = 0) & (til_C6 = 1) & (til_C3 = 1) & (til_C4 = 0) & (til_C7 = -1) & (t1 = 0) & (t2 = 0) & (t3 = 0) & (t4 = 0) & (B1 = 1) & (B2 = 1) & (B3 = 1) & (B4 = 1)'}
+    sys_init = {'(C1 = 1) & (C2 = 0) & (C5 = 0) & (C6 = 1) & (C3 = 1) & (C4 = 0) & (C7 = -1) & (til_C1 = 1) & (til_C2 = 0) & (til_C5 = 0) & (til_C6 = 1) & (til_C3 = 1) & (til_C4 = 0) & (til_C7 = -1) & (t1 = 0) & (t4 = 0) & (B1 = 1) & (B2 = 1) & (B3 = 1) & (B4 = 1)'}
     sys_prog = {}
 
     # Other environment specifications
