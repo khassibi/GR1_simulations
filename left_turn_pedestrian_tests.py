@@ -83,6 +83,11 @@ def experiment():
     with open(path + "ctrl", "rb") as file:
         ctrl = pickle.load(file)
     
+    # Labeling the nodes like system nodes
+    for edge in ctrl.edges:
+        for (key, val) in ctrl.edges[edge].items():
+            ctrl.nodes[edge[1]][key] = val
+    
     # Conversions
     light_conversion = ["g", "y", "r"]
     loc_conversion = ['c4', 'c7', 'c8', 'c9']
@@ -108,29 +113,31 @@ def experiment():
     mapping = dict(zip(nodes, new_labels))
     G = nx.relabel_nodes(G, mapping)
 
-    # Running the test that greedily picks the next state with the most unsafe 
-    # nodes
-    title = "Greedy Most Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_most_red, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # # Running the test that greedily picks the next state with the most unsafe 
+    # # nodes
+    # title = "Greedy Most Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_most_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    # Running the test that greedily picks the next state with the most unsafe 
-    # nodes
-    title = "Greedy Percent Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_percent_red, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # # Running the test that greedily picks the next state with the most unsafe 
+    # # nodes
+    # title = "Greedy Percent Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_percent_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "Greedy Min Robustness"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_min_robustness, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # title = "Greedy Min Robustness"
+    # vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_min_robustness, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "BFS Most Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_most_red, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # title = "BFS Most Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_most_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "BFS Percent Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_percent_red, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # title = "BFS Percent Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_percent_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    print(hardest_tests.average_robustness(G, ctrl))
 
 
 if __name__ == "__main__":
