@@ -208,3 +208,11 @@ def average_robustness(g, ctrl):
         # prev_env = env_node
     
     return transitions
+
+
+# Value iteration for robustness
+def value_iteration_robustness(g, ctrl):
+    # Start at the unsafe nodes, give them robustnesses of 0
+    # Look at their immediate ancestor 
+        # If the ancestor is a env node (oval), then make the robustness of this node the same as the current robustness
+        # Otherwise, jk I realized this will not work because we need the values of the other successors of this node in order to minimize or average them
