@@ -3,6 +3,7 @@ from tulip import spec
 from tulip import synth
 from tulip.transys import machines
 from tulip import dumpsmach
+import pickle
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -83,7 +84,7 @@ class RunnerBlocker:
         # Create a GR(1) specification
         specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init, env_safe, sys_safe, env_prog, sys_prog)
         # Print specifications:
-        print(specs.pretty())
+        # print(specs.pretty())
         #
         # Controller synthesis
         #
@@ -134,7 +135,12 @@ if __name__ == '__main__':
         for primed in [True, False]:
             for plus_one in [True, False]:
                 for transducer_moore in [True, False]:
-                    for qinit in ['\E \A', '\A \E', '\A \A', '\E \E']:
+                    for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
                         rb = RunnerBlocker(aug_ts,  primed, plus_one, transducer_moore, qinit)
                         rb.run()
                         simulations.append(rb)
+    
+    with open('runner_blocker/simulations', 'wb') as file:
+        pickle.dump(simulations, file)
+    
+
