@@ -8,19 +8,19 @@ import pickle
 logging.basicConfig(level=logging.WARNING)
 
 class RunnerBlocker:
-    def __init__(self, aug_ts, primed, plus_one, transducer_moore, qinit):
+    def __init__(self, aug, primed, plus_one, moore, qinit):
         '''
-        aug_ts: boolean evaluating to True when the runner can go through the middle
+        aug: boolean evaluating to True when the runner can go through the middle
         primed: boolean evaluating to True when we check if the next environment 
                 state collides with the current system state
         plus_one: boolean
-        transducer_moore: boolean if True is a moore machine and if False is mealy
+        moore: boolean if True is a moore machine and if False is mealy
         qinit: string 
         '''
-        self.aug_ts = aug_ts
+        self.aug = aug
         self.primed = primed
         self.plus_one = plus_one
-        self.transducer_moore = transducer_moore
+        self.moore = moore
         self.qinit = qinit
         self.realizable = None
         # self.ctrl_func = None
@@ -29,7 +29,7 @@ class RunnerBlocker:
         env_vars = {}
         sys_vars = {}
         env_vars['b'] = (1,3)
-        if self.aug_ts:
+        if self.aug:
             sys_vars['r'] = (1,5)
         else:
             sys_vars['r'] = (1,4)
@@ -44,7 +44,7 @@ class RunnerBlocker:
                 }
 
 
-        if self.aug_ts:
+        if self.aug:
             sys_safe = {
                         'r = 1 -> X(r=2 || r=3 || r=5)',
                         'r = 2 -> X(r=4)',
@@ -67,7 +67,7 @@ class RunnerBlocker:
                     '(b=3 -> !(r=3))',
         }
 
-        if self.aug_ts:
+        if self.aug:
             sys_safe |= {'(b=2 -> !(r=5))'}
 
         # Cannot be collided into:
@@ -91,7 +91,7 @@ class RunnerBlocker:
         # The controller decides based on current variable values only,
         # without knowing yet the next values that environment variables take.
         # A controller with this information flow is known as Moore.
-        specs.moore = self.transducer_moore
+        specs.moore = self.moore
 
         specs.plus_one = self.plus_one
 
@@ -109,7 +109,7 @@ class RunnerBlocker:
             self.realizable = True
 
             filename = 'runner_blocker/rb'
-            if self.aug_ts:
+            if self.aug:
                 filename += "_aug"
             if specs.moore:
                 filename += '_moore'
@@ -131,12 +131,12 @@ class RunnerBlocker:
 
 if __name__ == '__main__':
     simulations = []
-    for aug_ts in [True, False]:
+    for aug in [True, False]:
         for primed in [True, False]:
             for plus_one in [True, False]:
-                for transducer_moore in [True, False]:
+                for moore in [True, False]:
                     for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                        rb = RunnerBlocker(aug_ts,  primed, plus_one, transducer_moore, qinit)
+                        rb = RunnerBlocker(aug,  primed, plus_one, moore, qinit)
                         rb.run()
                         simulations.append(rb)
     
