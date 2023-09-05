@@ -1,104 +1,140 @@
-import tulip as tlp
-from tulip.interfaces import omega as omega_int
-from tulip import transys, abstract, spec, synth
-from visualization import graph_builder as gb
-import networkx as nx
+import logging
+from tulip import spec
+from tulip import synth
 from tulip.transys import machines
-
 from tulip import dumpsmach
-import pickle
 
-def experiment():
-    path = 'runner_blocker/'
-    # You can find the explainations of the states at GR1_simulations/RunnerBlockerStatesExplained.jpeg
+logging.basicConfig(level=logging.WARNING)
 
-    # System definition
-    # Making a finite transition system
-    sys = tlp.transys.FTS()
+class RunnerBlocker:
+    def __init__(self, aug_ts, primed, plus_one, transducer_moore, qinit):
+        '''
+        aug_ts: boolean evaluating to True when the runner can go through the middle
+        primed: boolean evaluating to True when we check if the next environment 
+                state collides with the current system state
+        plus_one: boolean
+        transducer_moore: boolean if True is a moore machine and if False is mealy
+        qinit: string 
+        '''
+        self.aug_ts = aug_ts
+        self.primed = primed
+        self.plus_one = plus_one
+        self.transducer_moore = transducer_moore
+        self.qinit = qinit
+        self.realizable = None
+        # self.ctrl_func = None
 
-    sys.states.add_from(['c1', 'c2', 'c3', 'c4'])
-    sys.states.initial.add('c1')  # start in state c1
+    def run(self):
+        env_vars = {}
+        sys_vars = {}
+        env_vars['b'] = (1,3)
+        if self.aug_ts:
+            sys_vars['r'] = (1,5)
+        else:
+            sys_vars['r'] = (1,4)
 
-    sys.transitions.add_comb({'c1'}, {'c2', 'c3'})
-    sys.transitions.add_comb({'c2'}, {'c4'})
-    sys.transitions.add_comb({'c3'}, {'c4'})
-    sys.transitions.add_comb({'c4'}, {'c4'})
+        env_init = {'b=2'}
+        sys_init = {'r=1'}
 
-    sys.atomic_propositions.add_from({'a1', 'a2', 'a3', 'a4'})
-    sys.states.add('c1', ap={'a1'})
-    sys.states.add('c2', ap={'a2'})
-    sys.states.add('c3', ap={'a3'})
-    sys.states.add('c4', ap={'a4'})
+        env_safe = {
+                    'b=1 -> X(b=2)',
+                    'b=2 -> X(b=1 || b=3)',
+                    'b=3 -> X(b=2)'
+                }
 
-    # Specifications for the environment
 
-    # Blocker dynamics
-    env_vars = {'b': (1, 3)}
-    env_init = {'b = 2'}
-    env_safe = {
-        'b = 2 -> next(b) = 1 | next(b) = 3',
-        'b = 1 -> next(b) = 2',
-        'b = 3 -> next(b) = 2'
-    }
-    env_prog = {}
+        if self.aug_ts:
+            sys_safe = {
+                        'r = 1 -> X(r=2 || r=3 || r=5)',
+                        'r = 2 -> X(r=4)',
+                        'r = 3 -> X(r=4)',
+                        'r = 4 -> X(r=4)',
+                        'r = 5 -> X(r=4)'
+                    }
+        else:
+            sys_safe = {
+                        'r = 1 -> X(r=2 || r=3)',
+                        'r = 2 -> X(r=4)',
+                        'r = 3 -> X(r=4)',
+                        'r = 4 -> X(r=4)'
+                    }
+        
 
-    # System variables and requirements
-    sys_vars = {}
-    sys_init = {'a1'}
-    sys_prog = {'a4'}
-    sys_safe = {
-        '!(a2 & b = 1)',
-        '!(a3 & b = 3)'
-        # '!(a2 & next(b) = 1)',
-        # '!(a3 & next(b) = 3)',
-        # 'b=1 -> !a2',
-        # 'b=3 -> !a3'
-    }
+        # Avoid collision:
+        sys_safe |= {
+                    '(b=1 -> !(r=2))',
+                    '(b=3 -> !(r=3))',
+        }
 
-    # Function found in tulip-control/tulip/spec/form.py
-    specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
-                            env_safe, sys_safe, env_prog, sys_prog)
-    specs.qinit = '\A \E'
-    specs.moore = False
-    print(specs.pretty())
+        if self.aug_ts:
+            sys_safe |= {'(b=2 -> !(r=5))'}
 
-    # Turning the specifications into an automaton
-    spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
-    aut = omega_int._grspec_to_automaton(spec)
+        # Cannot be collided into:
+        if self.primed:
+            sys_safe |= {
+                        "(!(r=2 & X(b=1)))",
+                        "(!(r=3 & X(b=3)))",
+                        "(!(r=5 & X(b=2)))",
+            }
 
-    # Synthesize the controller
-    ctrl = tlp.synth.synthesize(specs, sys=sys)
-    assert ctrl is not None, 'unrealizable'
-    with open(path + "/ctrl", "wb") as file:
-        pickle.dump(ctrl, file)
+        env_prog = {}
+        sys_prog = {'r=4'}
 
-    dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
+        # Create a GR(1) specification
+        specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init, env_safe, sys_safe, env_prog, sys_prog)
+        # Print specifications:
+        print(specs.pretty())
+        #
+        # Controller synthesis
+        #
+        # The controller decides based on current variable values only,
+        # without knowing yet the next values that environment variables take.
+        # A controller with this information flow is known as Moore.
+        specs.moore = self.transducer_moore
 
-    # Graphing
-    filename = path + "graph"
-    attributes = ['color', 'shape']
+        specs.plus_one = self.plus_one
 
-    # Making a graph of the asynchronous GR(1) game with deadends.
-    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
-    h0 = gb._game_format_nx(g0, attributes)
-    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf(path + 'game.pdf')
-    with open(filename, "wb") as file:
-        pickle.dump(g0, file)
-    
-    # Making a graph of the asynchronous GR(1) game without deadends.
-    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
-    h1 = gb._game_format_nx(g1, attributes)
-    pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf(path + 'game_no_deadends.pdf')
+        # Ask the synthesizer to find initial values for system variables
+        # that, for each initial values that environment variables can
+        # take and satisfy `env_init`, the initial state satisfies
+        # `env_init /\ sys_init`.
 
-    # Making a graph pf the state transitions of the environment and system
-    g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
-    h2, _ = gb._state_format_nx(g2, attributes)
-    pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf(path + 'states.pdf')
+        specs.qinit = self.qinit  # i.e., "there exist sys_vars: forall env_vars"
 
-    # machines.random_run(ctrl, N=10)
+        # At this point we can synthesize the controller
+        # using one of the available methods.
+        strategy = synth.synthesize(specs)
+        if strategy is not None:
+            self.realizable = True
 
-if __name__ == "__main__":
-    experiment()
+            filename = 'runner_blocker/rb'
+            if self.aug_ts:
+                filename += "_aug"
+            if specs.moore:
+                filename += '_moore'
+            else:
+                filename += '_mealy'
+
+            if specs.plus_one:
+                filename += '_plus_one'
+
+            if self.primed:
+                filename += '_primed'
+
+            filename += '_' + specs.qinit[1] + specs.qinit[-1] + '.py'
+
+            dumpsmach.write_python_case(filename, strategy, classname='runner')
+        else:
+            self.realizable = False
+
+
+if __name__ == '__main__':
+    simulations = []
+    for aug_ts in [True, False]:
+        for primed in [True, False]:
+            for plus_one in [True, False]:
+                for transducer_moore in [True, False]:
+                    for qinit in ['\E \A', '\A \E', '\A \A', '\E \E']:
+                        rb = RunnerBlocker(aug_ts,  primed, plus_one, transducer_moore, qinit)
+                        rb.run()
+                        simulations.append(rb)
