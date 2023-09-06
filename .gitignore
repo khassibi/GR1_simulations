@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # Ignore python files
-*.ipynb
+# *.ipynb
