@@ -58,7 +58,8 @@ class LeftTurn(simulations.Simulation):
         }
         env_prog |= {'light = "g1"'} # I added this because I think it should be there
         env_safe |= {
-            '!(light = "r" & (vh = 4 | vh = 5))'
+            '!(light = "r" & (vh = 4 | vh = 5))',
+            '!(light = "r" & X(vh = 4 | vh = 5))'
         }
 
         # System variables and requirements
