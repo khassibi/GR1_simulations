@@ -4,31 +4,12 @@ from tulip import synth
 from tulip.transys import machines
 from tulip import dumpsmach
 import pickle
+import simulations
 
 logging.basicConfig(level=logging.WARNING)
 
-path = 'runner_blocker/'
-
-class RunnerBlocker:
-    def __init__(self, aug, primed, plus_one, moore, qinit):
-        '''
-        aug: boolean evaluating to True when the runner can go through the middle
-        primed: boolean evaluating to True when we check if the next environment 
-                state collides with the current system state
-        plus_one: boolean
-        moore: boolean if True is a moore machine and if False is mealy
-        qinit: string 
-        '''
-        self.aug = aug
-        self.primed = primed
-        self.plus_one = plus_one
-        self.moore = moore
-        self.qinit = qinit
-        self.realizable = None
-        self.name = 'rb'
-        # self.ctrl_func = None
-
-    def run(self):
+class RunnerBlocker(simulations.Simulation):
+    def make_specs(self):
         env_vars = {}
         sys_vars = {}
         env_vars['b'] = (1,3)
@@ -105,34 +86,12 @@ class RunnerBlocker:
 
         specs.qinit = self.qinit  # i.e., "there exist sys_vars: forall env_vars"
 
-        # At this point we can synthesize the controller
-        # using one of the available methods.
-        strategy = synth.synthesize(specs)
-        if strategy is not None:
-            self.realizable = True
-
-            if self.aug:
-                self.name += "_aug"
-            if specs.moore:
-                self.name += '_moore'
-            else:
-                self.name += '_mealy'
-
-            if specs.plus_one:
-                self.name += '_plus_one'
-
-            if self.primed:
-                self.name += '_primed'
-
-            self.name += '_' + specs.qinit[1] + specs.qinit[-1]
-
-            dumpsmach.write_python_case(path + self.name + '.py', strategy, classname='runner')
-        else:
-            self.realizable = False
+        self.specs = specs
 
 
 if __name__ == '__main__':
-    simulations = []
+    path = 'runner_blocker/'
+    sims = []
     f = open(path + "runs.txt", "w")
     f.write("The simulations of runner blocker that have a realizable controller\n")
     for aug in [True, False]:
@@ -140,15 +99,17 @@ if __name__ == '__main__':
             for plus_one in [True, False]:
                 for moore in [True, False]:
                     for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                        rb = RunnerBlocker(aug,  primed, plus_one, moore, qinit)
-                        rb.run()
-                        simulations.append(rb)
-                        if rb.realizable:
+                        run = RunnerBlocker(aug,  primed, plus_one, moore, qinit)
+                        run.give_name('rb')
+                        run.make_specs()
+                        run.make_strat(path)
+                        sims.append(run)
+                        if run.realizable:
                             f.write('\n------\n')
-                            f.write(rb.name)
+                            f.write(run.name)
     f.close()
     
-    with open(path + 'simulations', 'wb') as file:
-        pickle.dump(simulations, file)
+    # with open(path + 'sims', 'wb') as file:
+    #     pickle.dump(sims, file)
     
 

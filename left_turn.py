@@ -5,38 +5,41 @@ from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
 
+import logging
+
 from tulip import dumpsmach
 import pickle
 
 path = 'left_turn/'
 
 class LeftTurn:
-    def __init__(self, aug, primed, plus_one, moore, qinit):
-        '''
-        aug: boolean evaluating to True when the runner can go through the middle
-        primed: boolean evaluating to True when we check if the next environment 
-                state collides with the current system state
-        plus_one: boolean
-        moore: boolean if True is a moore machine and if False is mealy
-        qinit: string 
-        '''
-        self.aug = aug
-        self.primed = primed
-        self.plus_one = plus_one
-        self.moore = moore
-        self.qinit = qinit
-        self.realizable = None
-        self.name = 'lf'
-        # self.ctrl_func = None
 
-    def run(self):
+    def make_specs(self):
+        sys = tlp.transys.FTS()
+
+        sys.atomic_propositions.add_from({'a4', 'a7', 'a8', 'a9'})
+        sys.states.add('c4', ap={'a4'})
+        sys.states.add('c7', ap={'a7'})
+        sys.states.add('c8', ap={'a8'})
+        sys.states.add('c9', ap={'a9'})
+        sys.states.initial.add('c7') 
+
+        sys.transitions.add_comb({'c7'}, {'c7', 'c8'})
+        sys.transitions.add_comb({'c8'}, {'c8', 'c4'})
+        ## Add remaining state transitions
+        sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
+        sys.transitions.add_comb({'c9'}, {'c9'})
+
+
         # Variables
         env_vars = {'vh': (2, 6), 'light': ["g1", "g2", "g3", "y1", "y2", "r"]}
-        sys_vars = {'a': [7, 8, 4, 9]}
+        # sys_vars = {'a': (1,4)}
+        sys_vars = {}
 
         # Initialization
         env_init = {'vh = 2', 'light = "g1"'}
-        sys_init = {'a = 7'}
+        # sys_init = {'a = 1'}
+        sys_init = {}
 
         # Safety
         env_safe = {
@@ -59,21 +62,25 @@ class LeftTurn:
 
         sys_safe = {
             # Autonomous vehicle movement
-            'a = 7 -> X(a=7 || a=8)',
-            'a = 8 -> X(a=8 || a=4)',
-            'a = 4 -> X(a=4 || a=9)',
-            'a = 9 -> X(a=9)',
+            # 'a = 1 -> X((a=1) || (a=2))',
+            # 'a = 2 -> X((a=2) || (a=3))',
+            # 'a = 3 -> X((a=3) || (a=4))',
+            # 'a = 4 -> X(a=4)',
             # No collisions
-            'vh = 4 -> !(a=4)',
+            # 'vh = 4 -> !(a=3)',
+            'vh = 4 -> !(a4)',
             # No running reds
-            '!(light = "r" & (a=4 || a=8))'
+            # '!(light = "r" & (a=3 || a=2))'
+            '!(light = "r" & (a8 || a4))'
         }
         if self.primed:
-            sys_safe |= {'!(X(vh=4) & (a=4))'}
+            # sys_safe |= {'!(X(vh=4) & (a=3))'}
+            sys_safe |= {'!(X(vh=4) & (a4))'}
 
         # Progress
         env_prog = {'vh = 6'}
-        sys_prog = {'a = 9'}
+        # sys_prog = {'a = 4'}
+        sys_prog = {'a9'}
 
         specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
                                 env_safe, sys_safe, env_prog, sys_prog)
@@ -96,35 +103,16 @@ class LeftTurn:
 
         specs.qinit = self.qinit  # i.e., "there exist sys_vars: forall env_vars"
 
-        # At this point we can synthesize the controller
-        # using one of the available methods.
-        strategy = synth.synthesize(specs)
-        if strategy is not None:
-            self.realizable = True
+        self.specs = specs
+        self.sys = sys
 
-            if self.aug:
-                self.name += "_aug"
-            if specs.moore:
-                self.name += '_moore'
-            else:
-                self.name += '_mealy'
-
-            if specs.plus_one:
-                self.name += '_plus_one'
-
-            if self.primed:
-                self.name += '_primed'
-
-            self.name += '_' + specs.qinit[1] + specs.qinit[-1]
-
-            dumpsmach.write_python_case(path + self.name + '.py', strategy, classname='left_turn')
-        else:
-            self.realizable = False
+        # self.make_strat(specs, sys, path)
 
 
 if __name__ == '__main__':
     simulations = []
-    f = open(path + "runs.txt", "w")
+    f2 = open(path + "visited.txt", "w")
+    f = open(path + "errored_runs.txt", "w")
     f.write("The simulations of left turn that have a realizable controller\n\n")
     for aug in [True, False]:
         for primed in [True, False]:
@@ -132,11 +120,22 @@ if __name__ == '__main__':
                 for moore in [True, False]:
                     for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
                         lt = LeftTurn(aug,  primed, plus_one, moore, qinit)
-                        lt.run()
+                        lt.give_name()
+                        f2.write(lt.name + '\n')
+                        try:
+                            lt.make_specs()
+                        except:
+                            lt.realizable = False
+                            lt.error = True
+                        if self.
                         simulations.append(lt)
-                        if lt.realizable:
+                        # if lt.realizable:
+                        #     f.write(lt.name)
+                        if lt.error:
+                            f.write('\n')
                             f.write(lt.name)
     f.close()
+    f2.close()
     
     with open(path + 'simulations', 'wb') as file:
         pickle.dump(simulations, file)
