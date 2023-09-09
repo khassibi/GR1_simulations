@@ -59,7 +59,6 @@ class LeftTurn(simulations.Simulation):
         env_prog |= {'light = "g1"'} # I added this because I think it should be there
         env_safe |= {
             '!(light = "r" & (vh = 4 | vh = 5))',
-            '!(light = "r" & X(vh = 4 | vh = 5))'
         }
 
         # System variables and requirements
@@ -68,6 +67,7 @@ class LeftTurn(simulations.Simulation):
         sys_prog = {'a9'}
         sys_safe = {
             '!(a4 & vh = 4)',
+            '!(a4 & X(vh = 4))',
             '!(light="r" & (a4 || a8))'
         }
 
@@ -116,9 +116,9 @@ if __name__ == '__main__':
                             run.make_strat(path)
                         except:
                             run.error = True
-                            f2.write(run.name + '\n ')
+                            f2.write(run.name + '\n')
                         sims.append(run)
                         if run.realizable:
-                            f.write(run.name + '\n ')
+                            f.write(run.name + '\n')
     f.close()
     f2.close()
