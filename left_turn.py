@@ -66,7 +66,8 @@ class LeftTurn(simulations.Simulation):
         sys_init = {}
         sys_prog = {'a9'}
         sys_safe = {
-            '!(a4 & vh = 4)'
+            '!(a4 & vh = 4)',
+            '!(light="r" & (a4 || a8))'
         }
 
         specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
