@@ -108,8 +108,3 @@ if __name__ == '__main__':
                             f.write('\n------\n')
                             f.write(run.name)
     f.close()
-    
-    # with open(path + 'sims', 'wb') as file:
-    #     pickle.dump(sims, file)
-    
-
