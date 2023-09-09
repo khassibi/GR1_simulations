@@ -1,15 +1,16 @@
-import logging
-from tulip import spec
-from tulip import synth
+import tulip as tlp
+from tulip.interfaces import omega as omega_int
+from tulip import transys, abstract, spec, synth
+from visualization import graph_builder as gb
+import networkx as nx
 from tulip.transys import machines
+
 from tulip import dumpsmach
 import pickle
 
-logging.basicConfig(level=logging.WARNING)
+path = 'left_turn/'
 
-path = 'runner_blocker/'
-
-class RunnerBlocker:
+class LeftTurn:
     def __init__(self, aug, primed, plus_one, moore, qinit):
         '''
         aug: boolean evaluating to True when the runner can go through the middle
@@ -25,67 +26,57 @@ class RunnerBlocker:
         self.moore = moore
         self.qinit = qinit
         self.realizable = None
-        self.name = 'rb'
+        self.name = 'lf'
         # self.ctrl_func = None
 
     def run(self):
-        env_vars = {}
-        sys_vars = {}
-        env_vars['b'] = (1,3)
-        if self.aug:
-            sys_vars['r'] = (1,5)
-        else:
-            sys_vars['r'] = (1,4)
+        # Variables
+        env_vars = {'vh': (2, 6), 'light': ["g1", "g2", "g3", "y1", "y2", "r"]}
+        sys_vars = {'a': [7, 8, 4, 9]}
 
-        env_init = {'b=2'}
-        sys_init = {'r=1'}
+        # Initialization
+        env_init = {'vh = 2', 'light = "g1"'}
+        sys_init = {'a = 7'}
 
+        # Safety
         env_safe = {
-                    'b=1 -> X(b=2)',
-                    'b=2 -> X(b=1 || b=3)',
-                    'b=3 -> X(b=2)'
-                }
-
-
-        if self.aug:
-            sys_safe = {
-                        'r = 1 -> X(r=2 || r=3 || r=5)',
-                        'r = 2 -> X(r=4)',
-                        'r = 3 -> X(r=4)',
-                        'r = 4 -> X(r=4)',
-                        'r = 5 -> X(r=4)'
-                    }
-        else:
-            sys_safe = {
-                        'r = 1 -> X(r=2 || r=3)',
-                        'r = 2 -> X(r=4)',
-                        'r = 3 -> X(r=4)',
-                        'r = 4 -> X(r=4)'
-                    }
-        
-
-        # Avoid collision:
-        sys_safe |= {
-                    '(b=1 -> !(r=2))',
-                    '(b=3 -> !(r=3))',
+            # Vehicle h movement
+            'vh = 2 -> X(vh=2 || vh=3)',
+            'vh = 3 -> X(vh=3 || vh=4)',
+            'vh = 4 -> X(vh=4 || vh=5)',
+            'vh = 5 -> X(vh=5 || vh=6)',
+            'vh = 6 -> X(vh=6)',
+            # Traffic light
+            'light = "g1" -> next(light = "g2")',
+            'light = "g2" -> next(light = "g3")',
+            'light = "g3" -> next(light = "y1")',
+            'light = "y1" -> next(light = "y2")',
+            'light = "y2" -> next(light = "r")',
+            # 'light = "r" -> next(light = "r") | next(light = "g1")',
+            # No running reds
+            '!(light = "r" & (vh=4 || vh=5))'
         }
 
-        if self.aug:
-            sys_safe |= {'(b=2 -> !(r=5))'}
-
-        # Cannot be collided into:
+        sys_safe = {
+            # Autonomous vehicle movement
+            'a = 7 -> X(a=7 || a=8)',
+            'a = 8 -> X(a=8 || a=4)',
+            'a = 4 -> X(a=4 || a=9)',
+            'a = 9 -> X(a=9)',
+            # No collisions
+            'vh = 4 -> !(a=4)',
+            # No running reds
+            '!(light = "r" & (a=4 || a=8))'
+        }
         if self.primed:
-            sys_safe |= {
-                        "(!(r=2 & X(b=1)))",
-                        "(!(r=3 & X(b=3)))",
-                        "(!(r=5 & X(b=2)))",
-            }
+            sys_safe |= {'!(X(vh=4) & (a=4))'}
 
-        env_prog = {}
-        sys_prog = {'r=4'}
+        # Progress
+        env_prog = {'vh = 6'}
+        sys_prog = {'a = 9'}
 
-        # Create a GR(1) specification
-        specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init, env_safe, sys_safe, env_prog, sys_prog)
+        specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
+                                env_safe, sys_safe, env_prog, sys_prog)
         # Print specifications:
         # print(specs.pretty())
         #
@@ -126,7 +117,7 @@ class RunnerBlocker:
 
             self.name += '_' + specs.qinit[1] + specs.qinit[-1]
 
-            dumpsmach.write_python_case(path + self.name + '.py', strategy, classname='runner')
+            dumpsmach.write_python_case(path + self.name + '.py', strategy, classname='left_turn')
         else:
             self.realizable = False
 
@@ -134,21 +125,18 @@ class RunnerBlocker:
 if __name__ == '__main__':
     simulations = []
     f = open(path + "runs.txt", "w")
-    f.write("The simulations of runner blocker that have a realizable controller\n")
+    f.write("The simulations of left turn that have a realizable controller\n\n")
     for aug in [True, False]:
         for primed in [True, False]:
             for plus_one in [True, False]:
                 for moore in [True, False]:
                     for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                        rb = RunnerBlocker(aug,  primed, plus_one, moore, qinit)
-                        rb.run()
-                        simulations.append(rb)
-                        if rb.realizable:
-                            f.write('\n------\n')
-                            f.write(rb.name)
+                        lt = LeftTurn(aug,  primed, plus_one, moore, qinit)
+                        lt.run()
+                        simulations.append(lt)
+                        if lt.realizable:
+                            f.write(lt.name)
     f.close()
     
     with open(path + 'simulations', 'wb') as file:
         pickle.dump(simulations, file)
-    
-
