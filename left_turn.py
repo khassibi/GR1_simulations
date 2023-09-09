@@ -41,19 +41,22 @@ class LeftTurn(simulations.Simulation):
             'vh = 3 -> next(vh) = 3 | next(vh) = 4',
             'vh = 4 -> next(vh) = 4 | next(vh) = 5',
             'vh = 5 -> next(vh) = 5 | next(vh) = 6',
-            'vh = 6 -> next(vh) = 6',
+            'vh = 6 -> next(vh) = 6'
         }
         env_prog = {'vh = 6'}
 
         # Traffic light 
-        env_vars.update({'light': ["g", "y", "r"]})
-        env_init.update({'light = "g"'})
+        env_vars.update({'light': ["g1", "g2", "g3", "y1", "y2", "r"]})
+        env_init.update({'light = "g1"'})
         env_safe |= {
-            'light = "g" -> next(light = "g") | next(light = "y")',
-            'light = "y" -> next(light = "r")',
-            'light = "r" -> next(light = "r") | next(light = "g")'
+            'light = "g1" -> next(light = "g2")',
+            'light = "g2" -> next(light = "g3")',
+            'light = "g3" -> next(light = "y1")',
+            'light = "y1" -> next(light = "y2")',
+            'light = "y2" -> next(light = "r")',
+            'light = "r" -> next(light = "r") | next(light = "g1")'
         }
-        env_prog |= {'light = "g"'} # I added this because I think it should be there
+        env_prog |= {'light = "g1"'} # I added this because I think it should be there
         env_safe |= {
             '!(light = "r" & (vh = 4 | vh = 5))'
         }
