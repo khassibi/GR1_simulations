@@ -4,6 +4,7 @@ from tulip import transys, abstract, spec, synth
 from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
+from GR1_defaults import settings
 
 from tulip import dumpsmach
 import pickle
@@ -71,10 +72,8 @@ def experiment():
         '!(a4 & vh = 4)'
     }
 
-    specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
-                            env_safe, sys_safe, env_prog, sys_prog)
-    specs.qinit = '\E \A'
-    specs.moore = True
+    specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
+                               env_safe, sys_safe, env_prog, sys_prog)
     print(specs.pretty())
 
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
@@ -84,7 +83,7 @@ def experiment():
     # Synthesize the controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
-    with open(path + "/ctrl", "wb") as file:
+    with open(path + "ctrl", "wb") as file:
         pickle.dump(ctrl, file)
 
     dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
