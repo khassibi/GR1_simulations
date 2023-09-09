@@ -67,9 +67,10 @@ class LeftTurn(simulations.Simulation):
         sys_prog = {'a9'}
         sys_safe = {
             '!(a4 & vh = 4)',
-            '!(a4 & X(vh = 4))',
             '!(light="r" & (a4 || a8))'
         }
+        if self.primed:
+            sys_safe |= {'!(a4 & X(vh = 4))'}
 
         specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
                                 env_safe, sys_safe, env_prog, sys_prog)
@@ -104,21 +105,20 @@ if __name__ == '__main__':
     f2 = open(path + "errors.txt", "w")
     f = open(path + "realizable.txt", "w")
     f.write("The simulations of runner blocker that have a realizable controller\n")
-    for aug in [True, False]:
-        for primed in [True, False]:
-            for plus_one in [True, False]:
-                for moore in [True, False]:
-                    for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                        run = LeftTurn(aug,  primed, plus_one, moore, qinit)
-                        run.give_name('lt')
-                        run.make_specs()
-                        try:
-                            run.make_strat(path)
-                        except:
-                            run.error = True
-                            f2.write(run.name + '\n')
-                        sims.append(run)
-                        if run.realizable:
-                            f.write(run.name + '\n')
+    for primed in [True, False]:
+        for plus_one in [True, False]:
+            for moore in [True, False]:
+                for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
+                    run = LeftTurn(False,  primed, plus_one, moore, qinit)
+                    run.give_name('lt')
+                    run.make_specs()
+                    try:
+                        run.make_strat(path)
+                    except:
+                        run.error = True
+                        f2.write(run.name + '\n')
+                    sims.append(run)
+                    if run.realizable:
+                        f.write(run.name + '\n')
     f.close()
     f2.close()

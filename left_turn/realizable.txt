@@ -1,18 +1,13 @@
 The simulations of runner blocker that have a realizable controller
-lt_aug_moore_primed_EA
- lt_aug_moore_primed_AE
- lt_aug_mealy_primed_EA
- lt_aug_mealy_primed_AE
- lt_aug_moore_EA
- lt_aug_moore_AE
- lt_aug_mealy_EA
- lt_aug_mealy_AE
- lt_moore_primed_EA
- lt_moore_primed_AE
- lt_mealy_primed_EA
- lt_mealy_primed_AE
- lt_moore_EA
- lt_moore_AE
- lt_mealy_EA
- lt_mealy_AE
- 
+lt_moore_primed_EA
+lt_moore_primed_AE
+lt_mealy_primed_EA
+lt_mealy_primed_AE
+lt_moore_plus_one_EA
+lt_moore_plus_one_AE
+lt_mealy_plus_one_EA
+lt_mealy_plus_one_AE
+lt_moore_EA
+lt_moore_AE
+lt_mealy_EA
+lt_mealy_AE
