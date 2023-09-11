@@ -29,51 +29,51 @@ def experiment():
     sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
     sys.transitions.add_comb({'c9'}, {'c9'})
 
-    # Specifications for the environment
+    # Variables
+    env_vars = {'vh': (2, 6), 
+                'light': ["g1", "g2", "g3", "y1", "y2", "r"]}
+    sys_vars = {}
 
-    # Human vehicle dynamics
-    env_vars = {'vh': (2, 6)}
-    env_init = {'vh = 2'}
+    # Initialization
+    env_init = {'vh = 2',
+                'light = "g1"'}
+    sys_init = sys_init = {}
+    
+    # Safety
     env_safe = {
+        # Human vehicle movement
         'vh = 2 -> next(vh) = 2 | next(vh) = 3',
-        ## Add remaining human vehicle dynamics
         'vh = 3 -> next(vh) = 3 | next(vh) = 4',
         'vh = 4 -> next(vh) = 4 | next(vh) = 5',
         'vh = 5 -> next(vh) = 5 | next(vh) = 6',
         'vh = 6 -> next(vh) = 6',
-    }
-    env_prog = {'vh = 6'}
-
-    # Traffic light 
-    env_vars.update({'light': ["g", "y", "r"]})
-    env_init.update({'light = "g"'})
-    env_safe |= {
-        # 'light = "g" -> next(light = "y")',
-        ## Add remaining light dynamics
-        # 'light = "y" -> next(light = "y") | next(light = "r")',
-        # 'light = "r" -> next(light = "r")'
-        # 'light = "r" -> next(light = "r") | next(light = "g")| '
-        # 'light = "y" -> next(light = "r")',
-        # 'light = "r" -> next(light = "g")'
-        'light = "g" -> next(light = "g") | next(light = "y")',
-        'light = "y" -> next(light = "r")',
-        'light = "r" -> next(light = "r") | next(light = "g")'
-    }
-    env_prog |= {'light = "g"'} # I added this because I think it should be there
-    env_safe |= {
+        # Traffic light
+        'light = "g1" -> next(light = "g2")',
+        'light = "g2" -> next(light = "g3")',
+        'light = "g3" -> next(light = "y1")',
+        'light = "y1" -> next(light = "y2")',
+        'light = "y2" -> next(light = "r")',
+        'light = "r" -> next(light = "r") | next(light = "g1")',
+        # Human vehicle does not run a red
         '!(light = "r" & (vh = 4 | vh = 5))'
     }
-
-    # System variables and requirements
-    sys_vars = {}
-    sys_init = {}
-    sys_prog = {'a9'}
     sys_safe = {
-        '!(a4 & vh = 4)'
+        # No collision with human vehicle
+        '!(a4 & vh = 4)',
+        # No running a red
+        '!(light="r" & (a4 || a8))' #,
+        # No being collided into by the human vehicle
+        # '!(a4 & X(vh = 4))'
     }
 
+    # Progress
+    env_prog = {'vh = 6',
+                'light = "g1"'}
+    sys_prog = {'a9'}
+        
+
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
-                               env_safe, sys_safe, env_prog, sys_prog)
+                            env_safe, sys_safe, env_prog, sys_prog)
     print(specs.pretty())
 
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
