@@ -25,7 +25,6 @@ def experiment():
 
     sys.transitions.add_comb({'c7'}, {'c7', 'c8'})
     sys.transitions.add_comb({'c8'}, {'c8', 'c4'})
-    ## Add remaining state transitions
     sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
     sys.transitions.add_comb({'c9'}, {'c9'})
 
@@ -37,7 +36,7 @@ def experiment():
     # Initialization
     env_init = {'vh = 2',
                 'light = "g1"'}
-    sys_init = sys_init = {}
+    sys_init = {}
     
     # Safety
     env_safe = {

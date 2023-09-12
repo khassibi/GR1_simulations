@@ -4,7 +4,6 @@ from tulip import transys, abstract, spec, synth
 from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
-from GR1_defaults import settings
 
 from tulip import dumpsmach
 import pickle
@@ -13,7 +12,10 @@ def experiment():
     path = 'left_turn_pedestrian/'
 
     # System definition
+    # Making a finite transition system
     sys = tlp.transys.FTS()
+    # .FiniteTransitionSystem
+    # ReactiveTest/quadruped_maze/setup_graphs.py
 
     sys.atomic_propositions.add_from({'a4', 'a7', 'a8', 'a9'})
     sys.states.add('c4', ap={'a4'})
@@ -24,62 +26,64 @@ def experiment():
 
     sys.transitions.add_comb({'c7'}, {'c7', 'c8'})
     sys.transitions.add_comb({'c8'}, {'c8', 'c4'})
+    ## Add remaining state transitions
     sys.transitions.add_comb({'c4'}, {'c4', 'c9'})
     sys.transitions.add_comb({'c9'}, {'c9'})
 
-    # Variables
-    env_vars = {'vh': (2, 6), 
-                'light': ["g1", "g2", "g3", "y1", "y2", "r"],
-                'p': (3, 6)}
-    sys_vars = {}
+    # Specifications for the environment
 
-    # Initialization
-    env_init = {'vh = 2',
-                'light = "g1"',
-                'p = 3'}
-    sys_init = {}
-
-    # Safety
+    # Human vehicle dynamics
+    env_vars = {'vh': (2, 6)}
+    env_init = {'vh = 2'}
     env_safe = {
-        # Human vehicle movement
         'vh = 2 -> next(vh) = 2 | next(vh) = 3',
+        ## Add remaining human vehicle dynamics
         'vh = 3 -> next(vh) = 3 | next(vh) = 4',
         'vh = 4 -> next(vh) = 4 | next(vh) = 5',
         'vh = 5 -> next(vh) = 5 | next(vh) = 6',
         'vh = 6 -> next(vh) = 6',
-        # Pedestrian movement
+    }
+    env_prog = {'vh = 6'}
+
+    # Pedestrain
+    env_vars.update({'p': (3, 6)})
+    env_init.update({'p = 3'})
+    env_safe |= {
         'p = 3 -> next(p) = 3 | next(p) = 4',
         'p = 4 -> next(p) = 4 | next(p) = 5',
         'p = 5 -> next(p) = 5 | next(p) = 6',
-        'p = 6 -> next(p) = 6',
-        # Traffic light
-        'light = "g1" -> next(light = "g2")',
-        'light = "g2" -> next(light = "g3")',
-        'light = "g3" -> next(light = "y1")',
-        'light = "y1" -> next(light = "y2")',
-        'light = "y2" -> next(light = "r")',
-        'light = "r" -> next(light = "r") | next(light = "g1")',
-        # Human vehicle does not run a red
-        '!(light = "r" & (vh = 4 | vh = 5))',
-        # No j-walking
-        '!(light = "r" & (p = 4 | p = 5))'
+        'p = 6 -> next(p) = 6'
     }
-    sys_safe = {
-        # No collisions
-        '!(a4 & vh = 4)',
-        '!(a4 & p = 4)',
-        # No running a red
-        '!(light="r" & (a4 || a8))'
+    env_prog |= {'p = 6'}
+
+    # Traffic light 
+    env_vars.update({'light': ["g", "y", "r"]})
+    env_init.update({'light = "g"'})
+    env_safe |= {
+        # 'light = "g" -> next(light = "y")',
+        ## Add remaining light dynamics
+        'light = "g" -> next(light = "g") | next(light = "y")',
+        'light = "y" -> next(light = "r")',
+        'light = "r" -> next(light = "r") | next(light = "g")'
+        # 'light = "r" -> next(light = "g")'
+    }
+    env_prog |= {'light = "g"'}
+
+    env_safe |= {
+        '!(light = "r" & (vh = 4 | vh = 5 | p = 4 | p = 5))'
     }
 
-    # Progress
-    env_prog = {'vh = 6',
-                'light = "g1"',
-                'p = 6'}
+    # System variables and requirements
+    sys_vars = {}
+    sys_init = {}
     sys_prog = {'a9'}
+    sys_safe = {
+        '!(a4 & vh = 4)',
+        '!(a4 & p = 4)'
+    }
 
     # Function found in tulip-control/tulip/spec/form.py
-    specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
+    specs = tlp.spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
     specs.qinit = '\E \A'
     specs.moore = True
