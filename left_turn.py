@@ -11,7 +11,7 @@ import pickle
 
 
 def experiment():
-    path = 'left_turn/'
+    path = 'left_turn/no_Xenv_currsys_'
 
     # System definition
     sys = tlp.transys.FTS()

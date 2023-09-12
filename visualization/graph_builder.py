@@ -208,8 +208,9 @@ def _game_graph(aut, qinit):
             # find or add node
             env_node, already_visited = _get_node({**d, **{'shape': 'box'}}, g, umap, keys)  # TODO: maybe I don't need to check to find the node
             check_bdd = aut.let(d, winning_set)
-            if check_bdd == aut.false:
-                g.nodes[env_node]['color'] = 'red'
+            # if check_bdd == aut.false:
+            #     g.nodes[env_node]['color'] = 'red'
+            #   TODO: if unnecessary, comment out the rest
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
@@ -357,8 +358,9 @@ def _state_graph(aut, qinit):
             # find or add node
             env_node, already_visited = _get_node(d, g, umap, keys)
             check_bdd = aut.let(d, winning_set)
-            if check_bdd == aut.false:
-                g.nodes[env_node]['color'] = 'red'
+            # if check_bdd == aut.false:
+                # g.nodes[env_node]['color'] = 'red'
+                # TODO: If I realize I don't need this, delete the code above that is unnecessary
             if not already_visited:
                 visited = enum._add_to_visited(d, visited, aut)
             c = remove_redundant_propositions(d_env)
