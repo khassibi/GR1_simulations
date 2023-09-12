@@ -63,6 +63,7 @@ def experiment():
         # No running a red
         '!(light="r" & (a4 || a8))' #,
         # No being collided into by the human vehicle
+        # Commenting this out means that we are considering the game as having simultaneous updates
         # '!(a4 & X(vh = 4))'
     }
 
