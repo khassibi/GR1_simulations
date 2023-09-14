@@ -170,6 +170,7 @@ def _game_graph(aut, qinit):
         check_bdd = aut.let(values, winning_set)
         if check_bdd == aut.false:
             g.nodes[node]['color'] = 'red'
+            continue
         u = aut.action['env']
         u = aut.let(values, u)
         # apply Mealy controller function
@@ -179,7 +180,7 @@ def _game_graph(aut, qinit):
         assert u != aut.false
         sys = aut.let(values, u)
         if sys == aut.false:
-            # g.nodes[node]['color'] = 'pink'
+            g.nodes[node]['color'] = 'red'
             continue
         for next_env in env_iter:
             log.debug('next_env: {r}'.format(r=next_env))
@@ -189,9 +190,9 @@ def _game_graph(aut, qinit):
             env_values = {unprime_vars[var]: value
                           for var, value in next_env.items()}
             v = aut.let(env_values, visited)
-            # v, _ = enum._select_candidate_nodes(
+            # v, _ = _select_candidate_nodes(
             #     u, v, aut, visited=True)  # u is the next nodes and v is the visited nodes
-            v, _ = enum._select_candidate_nodes(
+            v, _ = _select_candidate_nodes(
                 u, v, aut, visited=False)  # TODO: See how visited=True/False differ
             sys_iter = aut.pick_iter(
                 v, care_vars=aut.varlist['sys'])
@@ -248,6 +249,32 @@ def _game_graph(aut, qinit):
                     s=next_sys))
 
     return g
+
+def _select_candidate_nodes(
+        next_nodes, visited_nodes, aut, visited=True):
+    """Return set of next nodes to choose from, as BDD."""
+    u = next_nodes
+    v = visited_nodes
+    # prefer already visited nodes ?
+    if visited:
+        v &= u
+        if v == aut.false:
+            log.info('cannot remain in visited nodes')
+            v = u
+            remain = False
+        else:
+            remain = True
+    else:
+        v = u & ~ v
+        if v == aut.false:
+            log.info('cannot visit new nodes')
+            v = u
+            remain = True
+        else:
+            remain = False
+    # assert v != aut.false
+    # TODO: see if I need this assertion
+    return v, remain
 
 def _remove_deadends(graph):
     dead_ends = [1]
@@ -322,6 +349,7 @@ def _state_graph(aut, qinit):
         check_bdd = aut.let(values, winning_set)
         if check_bdd == aut.false:
             g.nodes[node]['color'] = 'red'
+            continue
         u = aut.action['env']
         u = aut.let(values, u)
         # apply Mealy controller function
@@ -331,7 +359,7 @@ def _state_graph(aut, qinit):
         assert u != aut.false
         sys = aut.let(values, u)
         if sys == aut.false:
-            # g.nodes[node]['color'] = 'red'
+            g.nodes[node]['color'] = 'red'
             continue
         for next_env in env_iter:
             log.debug('next_env: {r}'.format(r=next_env))
@@ -341,7 +369,7 @@ def _state_graph(aut, qinit):
             env_values = {unprime_vars[var]: value
                           for var, value in next_env.items()}
             v = aut.let(env_values, visited)
-            v, _ = enum._select_candidate_nodes(
+            v, _ = _select_candidate_nodes(
                 u, v, aut, visited=True)  # u is the next nodes and v is the visited nodes
             sys_iter = aut.pick_iter(
                 v, care_vars=aut.varlist['sys'])
