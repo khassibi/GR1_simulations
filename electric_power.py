@@ -40,12 +40,12 @@ def experiment():
     
     # Unhealthy generator remaining unhealthy
     for i in range(1,5):
-         env_safe |= {'g{0}=0 -> X(g{0}=0)'.format(i)}
+         env_safe |= {'(g{0}=0) -> X(g{0})=0'.format(i)}
 
     # Contactor Delays
     for i in range(1,5):
          env_safe |= {'(X(c{0}) = til_c{0}) -> (X(x{0}) = 0)'.format(i),
-                      '(c{0} = til_c{0}) -> (X(c{0}) = c{0})'.format(i),
+                      '(til_c{0} = c{0}) -> (X(c{0}) = c{0})'.format(i),
                       '(c{0} != til_c{0}) -> ((X(c{0}) = til_c{0}) | (X(x{0}) = (x{0} + 1)))'.format(i),
                       'x{0} <= 2'.format(i)}
     
