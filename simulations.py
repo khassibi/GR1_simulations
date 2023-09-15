@@ -7,7 +7,7 @@ from tulip.transys import machines
 from tulip import dumpsmach
 
 class Simulation:
-    def __init__(self, aug, primed, plus_one, moore, qinit):
+    def __init__(self, plus_one, moore, qinit, primed=False, aug=False):
         '''
         aug: boolean evaluating to True when the runner can go through the middle
         primed: boolean evaluating to True when we check if the next environment 

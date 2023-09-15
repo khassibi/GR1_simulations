@@ -106,12 +106,12 @@ if __name__ == '__main__':
     sims = []
     f2 = open(path + "errors.txt", "w")
     f = open(path + "realizable.txt", "w")
-    f.write("The simulations of runner blocker that have a realizable controller\n")
+    f.write("The simulations of left turn that have a realizable controller\n")
     for primed in [True, False]:
         for plus_one in [True, False]:
             for moore in [True, False]:
                 for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                    run = LeftTurn(False,  primed, plus_one, moore, qinit)
+                    run = LeftTurn(plus_one, moore, qinit, primed)
                     run.give_name('lt')
                     run.make_specs()
                     try:

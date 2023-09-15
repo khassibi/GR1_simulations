@@ -99,7 +99,7 @@ if __name__ == '__main__':
             for plus_one in [True, False]:
                 for moore in [True, False]:
                     for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
-                        run = RunnerBlocker(aug,  primed, plus_one, moore, qinit)
+                        run = RunnerBlocker(plus_one, moore, qinit, aug, primed)
                         run.give_name('rb')
                         run.make_specs()
                         run.make_strat(path)
