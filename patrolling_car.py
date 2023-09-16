@@ -31,6 +31,7 @@ def experiment():
         for y in range(1,4):
             sys.transitions.add_comb({'({},{})'.format(x, y)}, {'({},{})'.format(x+1, y), '({},{})'.format(x-1, y), '({},{})'.format(x,y+1), '({},{})'.format(x,y-1)})
     
+    # Corners
     sys.transitions.add_comb({'(0,0)'}, {'(1,0)', '(0,1)'})
     sys.transitions.add_comb({'(4,0)'}, {'(3,0)', '(4,1)'})
     sys.transitions.add_comb({'(4,4)'}, {'(3,4)', '(4,3)'})
@@ -54,9 +55,18 @@ def experiment():
     env_safe = {'(b=0) -> X(b=1)', '(b=4) -> X(b=3)'}
     for i in range(1,4):
         env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
+        
     sys_safe = {'!(fuel = 0)',
                 'refueling -> X(fuel = 8)', # TODO: make sure this works
-                '(!refueling) -> X(fuel) = fuel - 1'
+                '(!refueling & (fuel=8)) -> X(fuel=7)',
+                '(!refueling & (fuel=7)) -> X(fuel=6)',
+                '(!refueling & (fuel=6)) -> X(fuel=5)',
+                '(!refueling & (fuel=5)) -> X(fuel=4)',
+                '(!refueling & (fuel=4)) -> X(fuel=3)',
+                '(!refueling & (fuel=3)) -> X(fuel=2)',
+                '(!refueling & (fuel=2)) -> X(fuel=1)',
+                '(!refueling & (fuel=1)) -> X(fuel=0)',
+                '(!refueling & (fuel=0)) -> X(fuel=0)'
     }
     for i in range(0,5):
         sys_safe |= {'!(r{0} & (b={0}))'.format(i),
