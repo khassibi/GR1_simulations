@@ -55,7 +55,8 @@ def experiment():
     for i in range(1,4):
         env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
     sys_safe = {'!(fuel = 0)',
-                'refueling -> X(fuel = 8)' # TODO: make sure this works
+                'refueling -> X(fuel = 8)', # TODO: make sure this works
+                '(!refueling) -> X(fuel) = fuel - 1'
     }
     for i in range(0,5):
         sys_safe |= {'!(r{0} & (b={0}))'.format(i),
