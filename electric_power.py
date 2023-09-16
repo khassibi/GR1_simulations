@@ -19,10 +19,13 @@ class ElectricPower(simulations.Simulation):
         env_vars = {'g1': (0,1), 'g2': (0,1), 'g3': (0,1), 'g4': (0,1),
                     'r1': (0,1), 'r2': (0,1),
                     'c1': (0,1), 'c2': (0,1), 'c3': (0,1), 'c4': (0,1),
+                    'c5': (0,1), 'c6': (0,1), 'c7': (0,1), 
+                    'c8': (0,1), 'c9': (0,1), 'c10': (0,1),
                     'x1': (0,2), 'x2': (0,2), 'x3': (0,2), 'x4': (0,2)}
 
         sys_vars = {'til_c1': (0,1), 'til_c2': (0,1), 'til_c3': (0,1), 'til_c4': (0,1),
-                    'c5': (0,1), 'c6': (0,1), 'c7': (0,1), 'c8': (0,1), 'c9': (0,1), 'c10': (0,1),
+                    'til_c5': (0,1), 'til_c6': (0,1), 'til_c7': (0,1), 
+                    'til_c8': (0,1), 'til_c9': (0,1), 'til_c10': (0,1),
                     'b1': (0,1), 'b2': (0,1), 'b3': (0,1), 'b4': (0,1), 'b5': (0,1), 'b6': (0,1),
                     't1': (0,3), 't4': (0,3)}
         
@@ -30,10 +33,13 @@ class ElectricPower(simulations.Simulation):
         env_init = {'g1=1', 'g2=1', 'g3=1', 'g4=1',
                     'r1=1', 'r2=1',
                     'c1=1', 'c2=1', 'c3=1', 'c4=1',
+                    'c5=0', 'c6=0', 'c7=0', 
+                    'c8=1', 'c9=1', 'c10=1',
                     'x1=0', 'x2=0', 'x3=0', 'x4=0'}
 
         sys_init = {'til_c1=1', 'til_c2=1', 'til_c3=1', 'til_c4=1',
-                    'c5=0', 'c6=0', 'c7=0', 'c8=1', 'c9=1', 'c10=1',
+                    'til_c5=0', 'til_c6=0', 'til_c7=0', 
+                    'til_c8=1', 'til_c9=1', 'til_c10=1',
                     'b1=1', 'b2=1', 'b3=1', 'b4=1', 'b5=1', 'b6=1',
                     't1=0', 't4=0'}
 
@@ -51,16 +57,18 @@ class ElectricPower(simulations.Simulation):
                         '(til_c{0} = c{0}) -> (X(c{0}) = c{0})'.format(i),
                         '(c{0} != til_c{0}) -> ((X(c{0}) = til_c{0}) | (X(x{0}) = (x{0} + 1)))'.format(i),
                         'x{0} <= 2'.format(i)}
+        for i in range(6,11):
+            env_safe |= {'X(c{0}) = til_c{0}'.format(i)}
         
         # Unhealthy Sources
         sys_safe = set()
         neighbors = {('g1', 'til_c1'), ('g2', 'til_c2'), ('g3', 'til_c3'), ('g4', 'til_c4'),
-                    ('r1', 'c8'), ('r2', 'c9')}
+                    ('r1', 'til_c8'), ('r2', 'til_c9')}
         for a,b in neighbors:
             sys_safe |= {'({0} = 0) -> ({1} = 0)'.format(a, b)}
 
         # No Parallelization of AC Sources
-        sys_safe |= {'!(c1=1 & c5=1 & c2=1)',
+        env_safe |= {'!(c1=1 & c5=1 & c2=1)',
                     '!(c1=1 & c5=1 & c6=1 & c3=1)',
                     '!(c1=1 & c5=1 & c6=1 & c7=1 & c4=1)',
                     '!(c2=1 & c6=1 & c3=1)',

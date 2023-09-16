@@ -39,7 +39,7 @@ class LeftTurn(simulations.Simulation):
         # Initialization
         env_init = {'vh = 2',
                     'light = "g1"'}
-        sys_init = sys_init = {}
+        sys_init = {}
         
         # Safety
         env_safe = {
