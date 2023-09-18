@@ -89,7 +89,7 @@ def experiment():
     # Synthesizing system controller
     ctrl = tlp.synth.synthesize(specs, sys=sys)
     assert ctrl is not None, 'unrealizable'
-    with open(path + "/ctrl", "wb") as file:
+    with open(path + "ctrl", "wb") as file:
         pickle.dump(ctrl, file)
 
     # time, states = ctrl.run('Sinit')
