@@ -12,69 +12,66 @@ import pickle
 def experiment():
     path = 'patrolling_car/'
 
-    # System definition
-    sys = tlp.transys.FTS()
-
     # Define the states of the system
     states = []
     for x in range(5):
         for y in range(5):
-            states.append("({},{})".format(x, y))
-    sys.states.add_from(states)
-    sys.states.initial.add('(4,0)')
-
-    for x in range(1,4):
-        sys.transitions.add_comb({'({},{})'.format(x, 0)}, {'({},{})'.format(x-1, 0), '({},{})'.format(x+1, 0), '({},{})'.format(x,1)})
-        sys.transitions.add_comb({'({},{})'.format(x, 4)}, {'({},{})'.format(x-1, 4), '({},{})'.format(x+1, 4), '({},{})'.format(x,3)})
-        sys.transitions.add_comb({'({},{})'.format(0, x)}, {'({},{})'.format(0, x+1), '({},{})'.format(0, x-1), '({},{})'.format(1,x)})
-        sys.transitions.add_comb({'({},{})'.format(4, x)}, {'({},{})'.format(4, x+1), '({},{})'.format(4, x-1), '({},{})'.format(3,x)})
-        for y in range(1,4):
-            sys.transitions.add_comb({'({},{})'.format(x, y)}, {'({},{})'.format(x+1, y), '({},{})'.format(x-1, y), '({},{})'.format(x,y+1), '({},{})'.format(x,y-1)})
+            states.append("c{}{}".format(x, y))
     
-    # Corners
-    sys.transitions.add_comb({'(0,0)'}, {'(1,0)', '(0,1)'})
-    sys.transitions.add_comb({'(4,0)'}, {'(3,0)', '(4,1)'})
-    sys.transitions.add_comb({'(4,4)'}, {'(3,4)', '(4,3)'})
-    sys.transitions.add_comb({'(0,4)'}, {'(0,3)', '(1,4)'})
-
-    sys.atomic_propositions.add_from({'goal', 'refueling', 'r0', 'r1', 'r2', 'r3', 'r4'})
-    sys.states.add('(0,4)', ap={'goal'})
-    sys.states.add('(4,2)', ap={'refueling'})
-    for r in range(0,5):
-        sys.states.add('(1,{})'.format(r), ap={'r{}'.format(r)})
-
     # Variables
     env_vars = {'b': (0,4)}
-    sys_vars = {'fuel': (0,8)}
+    sys_vars = {'r': states,
+                'fuel': (0,8)
+    }
 
     # Initialization
     env_init = {'b=0'}
-    sys_init = {'fuel=8'}
+    sys_init = {'r="c40"',
+                'fuel=8'
+    }
 
     # Safety
     env_safe = {'(b=0) -> X(b=1)', '(b=4) -> X(b=3)'}
     for i in range(1,4):
         env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
-        
-    sys_safe = {'!(fuel = 0)',
-                'refueling -> X(fuel = 8)', # TODO: make sure this works
-                '(!refueling & (fuel=8)) -> X(fuel=7)',
-                '(!refueling & (fuel=7)) -> X(fuel=6)',
-                '(!refueling & (fuel=6)) -> X(fuel=5)',
-                '(!refueling & (fuel=5)) -> X(fuel=4)',
-                '(!refueling & (fuel=4)) -> X(fuel=3)',
-                '(!refueling & (fuel=3)) -> X(fuel=2)',
-                '(!refueling & (fuel=2)) -> X(fuel=1)',
-                '(!refueling & (fuel=1)) -> X(fuel=0)',
-                '(!refueling & (fuel=0)) -> X(fuel=0)'
+
+    sys_safe = set()
+
+    for x in range(1,4):
+        sys_safe |= {'(r="c{}{}") -> X((r="c{}{}") | (r="c{}{}") | (r="c{}{}"))'.format(x,0, x-1,0, x+1,0, x,1),
+                    '(r="c{}{}") -> X((r="c{}{}") | (r="c{}{}") | (r="c{}{}"))'.format(x,4, x-1,4, x+1,4, x,3),
+                    '(r="c{}{}") -> X((r="c{}{}") | (r="c{}{}") | (r="c{}{}"))'.format(0,x, 0,x+1, 0,x-1, 1,x),
+                    '(r="c{}{}") -> X((r="c{}{}") | (r="c{}{}") | (r="c{}{}"))'.format(4,x, 4,x+1, 4,x-1, 3,x)
+        }
+        for y in range(1,4):
+            sys_safe |= {'(r="c{}{}") -> X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}"))'.format(x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
+
+    # Corners
+    sys_safe |= {'(r="c00") -> X((r="c10") | (r="c01"))',
+                '(r="c40") -> X((r="c30") | (r="c41"))',
+                '(r="c44") -> X((r="c34") | (r="c43"))',
+                '(r="c04") -> X((r="c03") | (r="c14"))'
+    }
+
+    sys_safe |= {'!(fuel = 0)',
+                '(r="c42") -> X(fuel = 8)', # TODO: make sure this works
+                '(!(r="c42") & (fuel=8)) -> X(fuel=7)',
+                '(!(r="c42") & (fuel=7)) -> X(fuel=6)',
+                '(!(r="c42") & (fuel=6)) -> X(fuel=5)',
+                '(!(r="c42") & (fuel=5)) -> X(fuel=4)',
+                '(!(r="c42") & (fuel=4)) -> X(fuel=3)',
+                '(!(r="c42") & (fuel=3)) -> X(fuel=2)',
+                '(!(r="c42") & (fuel=2)) -> X(fuel=1)',
+                '(!(r="c42") & (fuel=1)) -> X(fuel=0)',
+                '(!(r="c42") & (fuel=0)) -> X(fuel=0)'
     }
     for i in range(0,5):
-        sys_safe |= {'!(r{0} & (b={0}))'.format(i),
-                    '!(r{0} & X(b={0}))'.format(i)}
+        sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
+                    '!((r="c1{0}") & X(b={0}))'.format(i)}
     
     # Progress
     env_prog = set()
-    sys_prog = {'goal'}
+    sys_prog = {'r="c04"'}
 
     # Settings for the specifications
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
@@ -82,11 +79,13 @@ def experiment():
     print(specs.pretty())
 
     # Turning the specifications into an automaton
-    spec = tlp.synth._spec_plus_sys(specs, sys, None, False, False)
+    # spec = tlp.synth._spec_plus_sys(specs, sys, None, False, False)
+    spec = tlp.synth._spec_plus_sys(specs, None, None, False, False)
     aut = omega_int._grspec_to_automaton(spec)
 
     # Synthesize the controller
-    ctrl = tlp.synth.synthesize(specs, sys=sys)
+    # ctrl = tlp.synth.synthesize(specs, sys=sys)
+    ctrl = tlp.synth.synthesize(specs)
     assert ctrl is not None, 'unrealizable'
     with open(path + "ctrl", "wb") as file:
         pickle.dump(ctrl, file)
