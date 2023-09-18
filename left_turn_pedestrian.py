@@ -78,11 +78,8 @@ def experiment():
                 'p = 6'}
     sys_prog = {'a9'}
 
-    # Function found in tulip-control/tulip/spec/form.py
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
-    specs.qinit = '\E \A'
-    specs.moore = True
     print(specs.pretty())
 
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
