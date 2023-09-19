@@ -22,16 +22,14 @@ def experiment():
     env_vars = {'b': (0,4)}
     sys_vars = {'r': states,
                 'fuel': (0,8),
-                'move': 'boolean',
-                'will_refuel': 'boolean'
+                'move': 'boolean'
     }
 
     # Initialization
     env_init = {'b=0'}
     sys_init = {'r="c40"',
                 'fuel=8',
-                '!move',
-                '!will_refuel'
+                '!move'
     }
 
     # Safety
@@ -57,14 +55,19 @@ def experiment():
                 '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
     }
 
-    sys_safe |= {'fuel != 0',
-                'X(r="c42") -> X(will_refuel)', # TODO: make sure this works
-                'will_refuel -> X(fuel = 8)',
-                '(X(move)) -> (X(fuel) = fuel - 1) | (will_refuel)'
+    sys_safe |= {'fuel > 0'
+                '(r="c42") -> (fuel = 8)',
+                '(X move && fuel=2) -> X(fuel = 1)',
+                '(X move && fuel=3) -> X(fuel = 2)',
+                '(X move && fuel=4) -> X(fuel = 3)',
+                '(X move && fuel=5) -> X(fuel = 4)',
+                '(X move && fuel=6) -> X(fuel = 5)',
+                '(X move && fuel=7) -> X(fuel = 6)',
+                '(X move && fuel=8) -> X(fuel = 7)'
     }
     for i in range(0,5):
-        sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
-                    '!((r="c1{0}") & X(b={0}))'.format(i)}
+        sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i)} #,
+                    # '!((r="c1{0}") & X(b={0}))'.format(i)}
     
     # Progress
     env_prog = set()
@@ -89,29 +92,31 @@ def experiment():
 
     dumpsmach.write_python_case(path + 'controller.py', ctrl, classname="sys_ctrl")
 
+    print('made controller')
+
     # Graphing
     filename = path + "graph"
     attributes = ['color', 'shape']
 
-    # Making a graph of the asynchronous GR(1) game with deadends.
-    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
-    h0 = gb._game_format_nx(g0, attributes)
-    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf(path + 'game.pdf')
-    with open(filename, "wb") as file:
-        pickle.dump(g0, file)
+    # # Making a graph of the asynchronous GR(1) game with deadends.
+    # g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
+    # h0 = gb._game_format_nx(g0, attributes)
+    # pd0 = nx.drawing.nx_pydot.to_pydot(h0)
+    # pd0.write_pdf(path + 'game.pdf')
+    # with open(filename, "wb") as file:
+    #     pickle.dump(g0, file)
     
-    # Making a graph of the asynchronous GR(1) game without deadends.
-    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
-    h1 = gb._game_format_nx(g1, attributes)
-    pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf(path + 'game_no_deadends.pdf')
+    # # Making a graph of the asynchronous GR(1) game without deadends.
+    # g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
+    # h1 = gb._game_format_nx(g1, attributes)
+    # pd1 = nx.drawing.nx_pydot.to_pydot(h1)
+    # pd1.write_pdf(path + 'game_no_deadends.pdf')
 
-    # Making a graph pf the state transitions of the environment and system
-    g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
-    h2, _ = gb._state_format_nx(g2, attributes)
-    pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf(path + 'states.pdf')
+    # # Making a graph pf the state transitions of the environment and system
+    # g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
+    # h2, _ = gb._state_format_nx(g2, attributes)
+    # pd2 = nx.drawing.nx_pydot.to_pydot(h2)
+    # pd2.write_pdf(path + 'states.pdf')
 
 if __name__ == '__main__':
     experiment()
