@@ -55,7 +55,7 @@ def experiment():
                 '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
     }
 
-    sys_safe |= {'fuel > 0'
+    sys_safe |= {'fuel > 0',
                 '(r="c42") -> (fuel = 8)',
                 '(X move && fuel=2) -> X(fuel = 1)',
                 '(X move && fuel=3) -> X(fuel = 2)',
@@ -68,6 +68,11 @@ def experiment():
     for i in range(0,5):
         sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i)} #,
                     # '!((r="c1{0}") & X(b={0}))'.format(i)}
+    # for i in range(1,4):
+    #     sys_safe |= {'!((r="c1{}") & (b={}))'.format(i, i-1),
+    #                  '!((r="c1{}") & (b={}))'.format(i, i+1)}
+    # sys_safe |= {'!((r="c14") & (b=3))',
+    #              '!((r="c10") & (b=1))'}
     
     # Progress
     env_prog = set()
