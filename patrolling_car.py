@@ -55,16 +55,11 @@ def experiment():
                 '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
     }
 
-    sys_safe |= {'fuel > 0',
-                '(r="c42") -> (fuel = 8)',
-                '(X move && fuel=2) -> X(fuel = 1)',
-                '(X move && fuel=3) -> X(fuel = 2)',
-                '(X move && fuel=4) -> X(fuel = 3)',
-                '(X move && fuel=5) -> X(fuel = 4)',
-                '(X move && fuel=6) -> X(fuel = 5)',
-                '(X move && fuel=7) -> X(fuel = 6)',
-                '(X move && fuel=8) -> X(fuel = 7)'
-    }
+    sys_safe |= {'(r="c42") -> (fuel = 8)', # TODO: make sure this works
+                    '(fuel=1) -> X(!move & fuel=1)',
+                    '(move && fuel<=2 && fuel<8 && !X(r="c42")) -> (X(fuel) = fuel - 1)',
+                    '(move && fuel=8 && !X(r="c42")) -> X(fuel = 7)'
+        }
     for i in range(0,5):
         sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i)} #,
                     # '!((r="c1{0}") & X(b={0}))'.format(i)}
