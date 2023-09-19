@@ -26,16 +26,14 @@ class PatrollingCar(simulations.Simulation):
         env_vars = {'b': (0,4)}
         sys_vars = {'r': states,
                     'fuel': (0,8),
-                    'move': 'boolean',
-                    'will_refuel': 'boolean'
+                    'move': 'boolean'
         }
 
         # Initialization
         env_init = {'b=0'}
         sys_init = {'r="c40"',
                     'fuel=8',
-                    '!move',
-                    '!will_refuel'
+                    '!move'
         }
 
         # Safety
@@ -61,14 +59,24 @@ class PatrollingCar(simulations.Simulation):
                     '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
         }
 
-        sys_safe |= {'fuel != 0',
-                    'X(r="c42") -> X(will_refuel)', # TODO: make sure this works
-                    'will_refuel -> X(fuel = 8)',
-                    '(X(move)) -> (X(fuel) = fuel - 1) | (will_refuel)'
+        sys_safe |= {'(r="c42") -> (fuel = 8)', # TODO: make sure this works
+                    '(fuel=1) -> X(!move & fuel=1)',
+                    '(move && fuel<=2 && fuel<8 && !X(r="c42")) -> (X(fuel) = fuel - 1)',
+                    # '(move && fuel=3) -> X(fuel = 2)',
+                    # '(move && fuel=4) -> X(fuel = 3)',
+                    # '(move && fuel=5) -> X(fuel = 4)',
+                    # '(move && fuel=6) -> X(fuel = 5)',
+                    # '(move && fuel=7) -> X(fuel = 6)',
+                    '(move && fuel=8 && !X(r="c42")) -> X(fuel = 7)'
         }
         for i in range(0,5):
-            sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
-                        '!((r="c1{0}") & X(b={0}))'.format(i)}
+            sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i)} #,
+                        # '!((r="c1{0}") & X(b={0}))'.format(i)}
+        for i in range(1,4):
+            sys_safe |= {'!((r="c1{}") & (b={}))'.format(i, i-1),
+                        '!((r="c1{}") & (b={}))'.format(i, i+1)}
+        sys_safe |= {'!((r="c14") & (b=3))'}
+        # sys_safe |= {'!((r="c10") & X(b=0))'}
         
         # Progress
         env_prog = set()
