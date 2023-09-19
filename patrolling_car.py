@@ -4,65 +4,118 @@ from tulip import transys, abstract, spec, synth
 from visualization import graph_builder as gb
 import networkx as nx
 from tulip.transys import machines
+import simulations
+
+import logging
 
 from tulip import dumpsmach
 import pickle
 
-def experiment():
-    path = 'patrolling_car/'
+class PatrollingCar(simulations.Simulation):
 
-    # System definition
-    sys = tlp.transys.FTS()
+    def make_specs(self):
+        path = 'patrolling_car/'
 
-    # Define the states of the system
-    states = []
-    for x in range(5):
-        for y in range(5):
-            states.append("({},{})".format(x, y))
-    sys.states.add_from(states)
-    sys.states.initial.add('(4,0)')
+        # Define the states of the system
+        states = []
+        for x in range(5):
+            for y in range(5):
+                states.append("c{}{}".format(x, y))
+        
+        # Variables
+        env_vars = {'b': (0,4)}
+        sys_vars = {'r': states,
+                    'fuel': (0,8),
+                    'move': 'boolean',
+                    'will_refuel': 'boolean'
+        }
 
-    for x in range(1,4):
-        sys.transitions.add_comb({'({},{})'.format(x, 0)}, {'({},{})'.format(x-1, 0), '({},{})'.format(x+1, 0), '({},{})'.format(x,1)})
-        sys.transitions.add_comb({'({},{})'.format(x, 4)}, {'({},{})'.format(x-1, 4), '({},{})'.format(x+1, 4), '({},{})'.format(x,3)})
-        sys.transitions.add_comb({'({},{})'.format(0, x)}, {'({},{})'.format(0, x+1), '({},{})'.format(0, x-1), '({},{})'.format(1,x)})
-        sys.transitions.add_comb({'({},{})'.format(4, x)}, {'({},{})'.format(4, x+1), '({},{})'.format(4, x-1), '({},{})'.format(3,x)})
-        for y in range(1,4):
-            sys.transitions.add_comb({'({},{})'.format(x, y)}, {'({},{})'.format(x+1, y), '({},{})'.format(x-1, y), '({},{})'.format(x,y+1), '({},{})'.format(x,y-1)})
-    
-    sys.transitions.add_comb({'(0,0)'}, {'(1,0)', '(0,1)'})
-    sys.transitions.add_comb({'(4,0)'}, {'(3,0)', '(4,1)'})
-    sys.transitions.add_comb({'(4,4)'}, {'(3,4)', '(4,3)'})
-    sys.transitions.add_comb({'(0,4)'}, {'(0,3)', '(1,4)'})
+        # Initialization
+        env_init = {'b=0'}
+        sys_init = {'r="c40"',
+                    'fuel=8',
+                    '!move',
+                    '!will_refuel'
+        }
 
-    sys.atomic_propositions.add_from({'goal', 'refueling', 'r0', 'r1', 'r2', 'r3', 'r4'})
-    sys.states.add('(0,4)', ap={'goal'})
-    sys.states.add('(4,2)', ap={'refueling'})
-    for r in range(0,5):
-        sys.states.add('(1,{})'.format(r), ap={'r{}'.format(r)})
+        # Safety
+        env_safe = {'(b=0) -> X(b=1)', '(b=4) -> X(b=3)'}
+        for i in range(1,4):
+            env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
 
-    # Variables
-    env_vars = {'b': (0,4)}
-    sys_vars = {'fuel': (0,8)}
+        sys_safe = set()
 
-    # Initialization
-    env_init = {'b=0'}
-    sys_init = {'fuel=8'}
+        for x in range(1,4):
+            sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,0, x-1,0, x+1,0, x,1),
+                        '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,4, x-1,4, x+1,4, x,3),
+                        '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(0,x, 0,x+1, 0,x-1, 1,x),
+                        '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(4,x, 4,x+1, 4,x-1, 3,x)
+            }
+            for y in range(1,4):
+                sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
 
-    # Safety
-    env_safe = {'(b=0) -> X(b=1)', '(b=4) -> X(b=3)'}
-    for i in range(1,4):
-        env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
-    sys_safe = {'fuel > 0',
-                'refueling -> fuel = 8' # TODO: make sure this works
-    }
-    for i in range(0,5):
-        sys_safe |= {'!(r{0} & (b={0}))'.format(i),
-                    '!(r{0} & X(b={0}))'.format(i)}
-    
-    # Progress
-    env_prog = {}
-    sys_prog = {'goal'}
+        # Corners
+        sys_safe |= {'(r="c00") -> (X((r="c10") | (r="c01")) & X move)',
+                    '(r="c40") -> (X((r="c30") | (r="c41")) & X move)',
+                    '(r="c44") -> (X((r="c34") | (r="c43")) & X move)',
+                    '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
+        }
+
+        sys_safe |= {'fuel != 0',
+                    'X(r="c42") -> X(will_refuel)', # TODO: make sure this works
+                    'will_refuel -> X(fuel = 8)',
+                    '(X(move)) -> (X(fuel) = fuel - 1) | (will_refuel)'
+        }
+        for i in range(0,5):
+            sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
+                        '!((r="c1{0}") & X(b={0}))'.format(i)}
+        
+        # Progress
+        env_prog = set()
+        sys_prog = {'r="c04"'}
+
+        specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init,
+                                env_safe, sys_safe, env_prog, sys_prog)
+        # Print specifications:
+        # print(specs.pretty())
+        #
+        # Controller synthesis
+        #
+        # The controller decides based on current variable values only,
+        # without knowing yet the next values that environment variables take.
+        # A controller with this information flow is known as Moore.
+        specs.moore = self.moore
+
+        specs.plus_one = self.plus_one
+
+        # Ask the synthesizer to find initial values for system variables
+        # that, for each initial values that environment variables can
+        # take and satisfy `env_init`, the initial state satisfies
+        # `env_init /\ sys_init`.
+
+        specs.qinit = self.qinit  # i.e., "there exist sys_vars: forall env_vars"
+
+        self.specs = specs
 
 if __name__ == '__main__':
-    experiment()
+    path = 'patrolling_car/'
+    sims = []
+    f2 = open(path + "errors.txt", "w")
+    f = open(path + "realizable.txt", "w")
+    f.write("The simulations of patrolling car that have a realizable controller\n")
+    for plus_one in [True, False]:
+        for moore in [True, False]:
+            for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
+                run = PatrollingCar(plus_one, moore, qinit)
+                run.give_name('lt')
+                run.make_specs()
+                try:
+                    run.make_strat(path)
+                except:
+                    run.error = True
+                    f2.write(run.name + '\n')
+                sims.append(run)
+                if run.realizable:
+                    f.write(run.name + '\n')
+    f.close()
+    f2.close()
