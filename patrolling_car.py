@@ -22,14 +22,16 @@ def experiment():
     env_vars = {'b': (0,4)}
     sys_vars = {'r': states,
                 'fuel': (0,8),
-                'refueling': 'boolean'
+                'move': 'boolean',
+                'will_refuel': 'boolean'
     }
 
     # Initialization
     env_init = {'b=0'}
     sys_init = {'r="c40"',
                 'fuel=8',
-                '!refueling'
+                '!move',
+                '!will_refuel'
     }
 
     # Safety
@@ -40,24 +42,25 @@ def experiment():
     sys_safe = set()
 
     for x in range(1,4):
-        sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & (X(fuel) = fuel-1 | refueling))'.format(x,0, x-1,0, x+1,0, x,1),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & (X(fuel) = fuel-1 | refueling))'.format(x,4, x-1,4, x+1,4, x,3),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & (X(fuel) = fuel-1 | refueling))'.format(0,x, 0,x+1, 0,x-1, 1,x),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & (X(fuel) = fuel-1 | refueling))'.format(4,x, 4,x+1, 4,x-1, 3,x)
+        sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,0, x-1,0, x+1,0, x,1),
+                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,4, x-1,4, x+1,4, x,3),
+                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(0,x, 0,x+1, 0,x-1, 1,x),
+                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(4,x, 4,x+1, 4,x-1, 3,x)
         }
         for y in range(1,4):
-            sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & (X(fuel) = fuel-1 | refueling))'.format(x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
+            sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
 
     # Corners
-    sys_safe |= {'(r="c00") -> (X((r="c10") | (r="c01")) & (X(fuel) = fuel-1 | refueling))',
-                '(r="c40") -> (X((r="c30") | (r="c41")) & (X(fuel) = fuel-1 | refueling))',
-                '(r="c44") -> (X((r="c34") | (r="c43")) & (X(fuel) = fuel-1 | refueling))',
-                '(r="c04") -> (X((r="c03") | (r="c14")) & (X(fuel) = fuel-1 | refueling))'
+    sys_safe |= {'(r="c00") -> (X((r="c10") | (r="c01")) & X move)',
+                '(r="c40") -> (X((r="c30") | (r="c41")) & X move)',
+                '(r="c44") -> (X((r="c34") | (r="c43")) & X move)',
+                '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
     }
 
-    sys_safe |= {'fuel!= 0',
-                'X(r="c42") -> X(refueling)', # TODO: make sure this works
-                'refueling -> X(fuel = 8)'
+    sys_safe |= {'fuel != 0',
+                'X(r="c42") -> X(will_refuel)', # TODO: make sure this works
+                'will_refuel -> X(fuel = 8)',
+                '(X(move)) -> (X(fuel) = fuel - 1) | (will_refuel)'
     }
     for i in range(0,5):
         sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
