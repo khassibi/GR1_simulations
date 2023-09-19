@@ -418,10 +418,11 @@ def remove_redundant_propositions(dict):
     """
     c = []
     for k, v in dict.items():
-        if type(v) == bool:
-            if v:
-                c.append(str(k))
-        elif k not in ['color', 'loc', 'eloc', 'shape']:
+        # if type(v) == bool:
+        #     if v:
+        #         c.append(str(k))
+        # el
+        if k not in ['color', 'loc', 'eloc', 'shape']:
             c.append('{var}={val}'.format(var=k, val=v))
     return c
 
