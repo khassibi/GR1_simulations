@@ -35,6 +35,39 @@ def percent_red_successors(g):
     
     return value
 
+def find_min_robustness(g):
+    env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
+    robustness = dict()
+    
+    max_val = len(g.nodes) + 1
+    nodes_to_visit = set()
+    for env_node in env_nodes:
+        if 'color' in g.nodes[env_node] and g.nodes[env_node]['color'] == 'red':
+            nodes_to_visit.add(env_node)
+        else:
+            robustness[env_node] = max_val
+
+    visited = nodes_to_visit.copy()
+    distance = 0
+    while nodes_to_visit:
+        new_nodes_to_visit = set()
+        for env_node in nodes_to_visit:
+            robustness[env_node] = distance
+            for sys_parent in list(g.predecessors(env_node)):
+                for env_parent in list(g.predecessors(sys_parent)):
+                    if env_parent not in visited:
+                        new_nodes_to_visit.add(env_parent)
+        visited.update(new_nodes_to_visit)
+        nodes_to_visit = new_nodes_to_visit.copy()
+        distance += 1
+    
+    return robustness
+
+
+
+
+
+
 def greedy_most_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
