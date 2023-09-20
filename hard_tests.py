@@ -3,7 +3,7 @@ import networkx as nx
 # Finding the metrics
 def num_red_successors(g):
     '''
-    Taking in graph g and returning a dictionary of the number of unsafe actions
+    Taking in graph `g` and returning a dictionary of the number of unsafe actions
     that each system node has.
     For system nodes that are red, they get a default value of the number of 
     nodes in g + 1. However, there should not be any red system nodes, so this 
@@ -27,7 +27,7 @@ def num_red_successors(g):
 
 def percent_red_successors(g):
     '''
-    Taking in graph g and returning a dictionary of the percent of unsafe 
+    Taking in graph `g` and returning a dictionary of the percent of unsafe 
     actions that each system node has.
     For system nodes that are red, they get a default value of 1. However, there
     should not be any red system nodes, so this case should never happen. 
@@ -51,7 +51,7 @@ def percent_red_successors(g):
 
 def find_min_robustness(g):
     '''
-    Taking in graph g and returning a dictionary of the minimum robustness of 
+    Taking in graph `g` and returning a dictionary of the minimum robustness of 
     each environment node.
     The minimum robustness of a node s is defined as the minimum distance from 
     state s to any unsafe state. 
@@ -87,7 +87,7 @@ def find_min_robustness(g):
 
 def find_avg_robustness(g):
     '''
-    Taking in graph g and returning a dictionary of the average robustness of 
+    Taking in graph `g` and returning a dictionary of the average robustness of 
     each environment node.
     The minimum robustness of a node s is defined as the minimum distance from 
     state s to any unsafe state. 
@@ -126,7 +126,7 @@ def find_avg_robustness(g):
 # Creating the tests
 def greedy_max_metric(g, sys_metric):
     '''
-    Takes in a graph and a metric on the system nodes. 
+    Takes in a graph `g` and a metric on the system nodes `sys_metric`. 
     At each environment node, the environment transitions to the system
     successor node that has the largest metric value. 
     '''
@@ -148,6 +148,13 @@ def greedy_max_metric(g, sys_metric):
     return transitions
 
 def myopic_robustness_minimization(g, env_robustness):
+    '''
+    Takes in a graph `g` and a robustness measure on the environment nodes 
+    `env_robustness`.
+    Starting at an environment node, the environment transitions to the 
+    successor system node in which the maximum robustness value among 
+    all of its successors is the smallest. 
+    '''
     assert(type(env_robustness) == dict)
     transitions = dict()
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
@@ -156,6 +163,7 @@ def myopic_robustness_minimization(g, env_robustness):
     for env_node in env_nodes:
         min_rob = infinity_ish
         actions = []
+        max_rob = -1 # I am pretty sure I need to initialize max_rob here because of scope
         for sys_suc in list(g.successors(env_node)):
             max_rob = -1
             for env_suc in list(g.successors(sys_suc)):
@@ -169,3 +177,34 @@ def myopic_robustness_minimization(g, env_robustness):
     
     return transitions
             
+def myopic_robustness_averaging(g, env_robustness):
+    '''
+    Takes in a graph `g` and a robustness measure on the environment nodes 
+    `env_robustness`.
+    Starting at an environment node, the environment transitions to the 
+    successor system node in which the average robustness value among 
+    all of its successors is the smallest. 
+    '''
+    assert(type(env_robustness) == dict)
+    transitions = dict()
+    env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
+
+    infinity_ish = len(g.nodes) + 1
+    for env_node in env_nodes:
+        min_rob = infinity_ish
+        actions = []
+        avg = 0
+        for sys_suc in list(g.successors(env_node)):
+            sum = 0
+            env_successors = list(g.successors(sys_suc))
+            for env_suc in env_successors:
+                sum += env_robustness[env_suc]
+            avg = sum / len(env_successors)
+        if avg < min_rob:
+            min_rob = avg
+            actions = [sys_suc]
+        elif sum == min_rob:
+            actions.append(sys_suc)
+        transitions[env_node] = actions
+    
+    return transitions
