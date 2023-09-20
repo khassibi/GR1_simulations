@@ -72,8 +72,8 @@ def experiment():
         # No being collided into
         # '!(a4 & X(vh = 4))',
         # '!(a4 & X(p = 4))',
-        '!(a4 & vh = 3)',
-        '!(a4 & p = 3)',
+        # '!(a4 & vh = 3)',
+        # '!(a4 & p = 3)',
         # No running a red
         '!(light="r" & (a4 || a8))'
     }
@@ -86,7 +86,7 @@ def experiment():
 
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
-    specs.moore = True
+    # specs.moore = True
     print(specs.pretty())
 
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
