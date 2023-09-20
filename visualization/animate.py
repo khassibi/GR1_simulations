@@ -71,13 +71,13 @@ def animate_intersection(light, paths, title):
             trail.set_data(path_data[..., : num + 1] + [[shift], [0]])
             point.set_data(path_data[..., num] + [shift, 0])
 
-        if light[num] == "green" or light[num] == 'g':
+        if 'g' in light[num]:
             light_marker.set_markerfacecolor("g")
             light_marker.set_markeredgecolor("g")
-        elif light[num] == "yellow" or light[num] == 'y':
+        elif 'y' in light[num]:
             light_marker.set_markerfacecolor("y")
             light_marker.set_markeredgecolor("y")                     
-        elif light[num] == "red" or light[num] == 'r':
+        elif 'r' in light[num]:
             light_marker.set_markerfacecolor("r")
             light_marker.set_markeredgecolor("r")
         else:

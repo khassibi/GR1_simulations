@@ -29,14 +29,14 @@ def experiment():
 
     # Variables
     env_vars = {'vh': (2, 6), 
-                'light': ["g1", "g2", "g3", "y1", "y2", "r"],
-                'p': (3, 6)}
+                'p': (3, 6),
+                'light': ["g1", "g2", "g3", "y1", "y2", "r"],}
     sys_vars = {}
 
     # Initialization
     env_init = {'vh = 2',
-                'light = "g1"',
-                'p = 3'}
+                'p = 3',
+                'light = "g1"'}
     sys_init = {}
 
     # Safety
@@ -108,17 +108,17 @@ def experiment():
     with open(filename, "wb") as file:
         pickle.dump(g0, file)
 
-    # Making a graph of the asynchronous GR(1) game without deadends.
-    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
-    h1 = gb._game_format_nx(g1, attributes)
-    pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    pd1.write_pdf(path + 'game_no_deadends.pdf')
+    # # Making a graph of the asynchronous GR(1) game without deadends.
+    # g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
+    # h1 = gb._game_format_nx(g1, attributes)
+    # pd1 = nx.drawing.nx_pydot.to_pydot(h1)
+    # pd1.write_pdf(path + 'game_no_deadends.pdf')
 
-    # Making a graph pf the state transitions of the environment and system
-    g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
-    h2, _ = gb._state_format_nx(g2, attributes)
-    pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    pd2.write_pdf(path + 'states.pdf')
+    # # Making a graph pf the state transitions of the environment and system
+    # g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
+    # h2, _ = gb._state_format_nx(g2, attributes)
+    # pd2 = nx.drawing.nx_pydot.to_pydot(h2)
+    # pd2.write_pdf(path + 'states.pdf')
 
 if __name__ == "__main__":
     experiment()

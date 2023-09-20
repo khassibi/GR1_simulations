@@ -12,7 +12,7 @@ import networkx as nx
 
 path = 'left_turn_pedestrian/'
 
-def test(G, init_node, test, max_runs):
+def test_with_metric(G, init_node, test, metric, max_runs):
     curr_num = init_node
 
     # Initializing the initial state
@@ -27,14 +27,15 @@ def test(G, init_node, test, max_runs):
     light_signal = [light]
 
     # Finding the transitions for the test
-    test_transitions = test(G)
+    test_transitions = test(G, metric)
     
     sys_control = sys_ctrl()
     env_state = sys_ctrl.move(sys_control, vh, p, light)
     env_state.update({'vh': vh, "p": p, 'light': light, 'shape': 'oval'})
     assert env_state == init_state, (env_state, init_state)
 
-    curr_num = random.choice(test_transitions[curr_num])
+    # curr_num = random.choice(test_transitions[curr_num])
+    curr_num = test_transitions[curr_num][0]
 
     # Running the test
     counter = 0
@@ -116,32 +117,36 @@ def experiment():
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Most Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_most_red, 20)
+    num_red_sys_metric = hard_tests.num_red_successors(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, num_red_sys_metric, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Percent Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_percent_red, 20)
+    percent_red_sys_metric = hard_tests.num_red_successors(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, percent_red_sys_metric, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "Greedy Min Robustness"
-    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_min_robustness, 20)
+    title = "Greedy Min Robustness - Minimizing"
+    min_robustness_env_metric = hard_tests.find_min_robustness(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, min_robustness_env_metric, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "Greedy Average Robustness"
-    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_average_robustness, 20)
+    title = "Greedy Average Robustness - Minimizing"
+    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, avg_robustness_env_metric, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    # title = "BFS Most Red"
-    # vh_signal, p_signal, light_signal = test(G, 0, hard_tests.BFS_most_red, 20)
-    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    title = "Greedy Min Robustness - Averaging"
+    min_robustness_env_metric = hard_tests.find_min_robustness(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, min_robustness_env_metric, 20)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    # title = "BFS Percent Red"
-    # vh_signal, p_signal, light_signal = test(G, 0, hard_tests.BFS_percent_red, 20)
-    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
-
-    # print(hard_tests.average_robustness(G, ctrl))
+    title = "Greedy Average Robustness - Averaging"
+    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, avg_robustness_env_metric, 20)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
 
 if __name__ == "__main__":
