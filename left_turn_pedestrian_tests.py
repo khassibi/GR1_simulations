@@ -118,34 +118,34 @@ def experiment():
     # nodes
     title = "Greedy Most Red"
     num_red_sys_metric = hard_tests.num_red_successors(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, num_red_sys_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, num_red_sys_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Percent Red"
     percent_red_sys_metric = hard_tests.num_red_successors(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, percent_red_sys_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.greedy_max_metric, percent_red_sys_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     title = "Greedy Min Robustness - Minimizing"
     min_robustness_env_metric = hard_tests.find_min_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, min_robustness_env_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, min_robustness_env_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     title = "Greedy Average Robustness - Minimizing"
     avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, avg_robustness_env_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_minimization, avg_robustness_env_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     title = "Greedy Min Robustness - Averaging"
     min_robustness_env_metric = hard_tests.find_min_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, min_robustness_env_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, min_robustness_env_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     title = "Greedy Average Robustness - Averaging"
     avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, avg_robustness_env_metric, 20)
+    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.myopic_robustness_averaging, avg_robustness_env_metric, 30)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
 

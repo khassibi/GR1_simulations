@@ -58,7 +58,8 @@ def experiment():
         'light = "g3" -> next(light = "y1")',
         'light = "y1" -> next(light = "y2")',
         'light = "y2" -> next(light = "r")',
-        'light = "r" -> next(light = "r") | next(light = "g1")',
+        # 'light = "r" -> next(light = "r") | next(light = "g1")',
+        'light = "r" -> next(light = "g1")',
         # Human vehicle does not run a red
         '!(light = "r" & (vh = 4 | vh = 5))',
         # No j-walking
@@ -68,6 +69,9 @@ def experiment():
         # No collisions
         '!(a4 & vh = 4)',
         '!(a4 & p = 4)',
+        # No being collided into
+        # '!(a4 & X(vh = 4))',
+        # '!(a4 & X(p = 4))',
         # No running a red
         '!(light="r" & (a4 || a8))'
     }
@@ -80,6 +84,7 @@ def experiment():
 
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
                             env_safe, sys_safe, env_prog, sys_prog)
+    specs.moore = True
     print(specs.pretty())
 
     spec = tlp.synth._spec_plus_sys(specs, None, sys, False, False)
