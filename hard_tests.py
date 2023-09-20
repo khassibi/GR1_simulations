@@ -1,6 +1,13 @@
 import networkx as nx
 
 def num_red_successors(g):
+    '''
+    Taking in graph g and returning a dictionary of the number of unsafe actions
+    that each system node has.
+    For system nodes that are red, they get a default value of the number of 
+    nodes in g + 1. However, there should not be any red system nodes, so this 
+    case should never happen. 
+    '''
     sys_nodes = [node for node in g.nodes if 'box' in g.nodes[node]['shape']]
     value = dict()
     max_val = len(g.nodes) + 1
@@ -18,6 +25,12 @@ def num_red_successors(g):
     return value
 
 def percent_red_successors(g):
+    '''
+    Taking in graph g and returning a dictionary of the percent of unsafe 
+    actions that each system node has.
+    For system nodes that are red, they get a default value of 1. However, there
+    should not be any red system nodes, so this case should never happen. 
+    '''
     sys_nodes = [node for node in g.nodes if 'box' in g.nodes[node]['shape']]
     value = dict()
     max_val = 1
@@ -36,6 +49,14 @@ def percent_red_successors(g):
     return value
 
 def find_min_robustness(g):
+    '''
+    Taking in graph g and returning a dictionary of the minimum robustness of 
+    each environment node.
+    The minimum robustness of a node s is defined as the minimum distance from 
+    state s to any unsafe state. 
+    If there is no path from a node to any unsafe node, then this node will have
+    a robustness of the number of nodes in g + 1.
+    '''
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     robustness = dict()
     
@@ -62,6 +83,43 @@ def find_min_robustness(g):
         distance += 1
     
     return robustness
+
+def find_avg_robustness(g):
+    '''
+    Taking in graph g and returning a dictionary of the average robustness of 
+    each environment node.
+    The minimum robustness of a node s is defined as the minimum distance from 
+    state s to any unsafe state. 
+    If there is no path from a node to any unsafe node, then this node will have
+    a robustness of the number of nodes in g + 1.
+    Nodes that are red will not be given an average robustness but will instead 
+    have a robustness of 0. 
+    '''
+    env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
+    robustness = dict()
+    
+    max_val = len(g.nodes) + 1
+    red_nodes = []
+    non_red = []
+    num_red = 0
+    for env_node in env_nodes:
+        if 'color' in g.nodes[env_node] and g.nodes[env_node]['color'] == 'red':
+            robustness[env_node] = 0
+            red_nodes.append(env_node)
+            num_red += 1
+        else:
+            robustness[env_node] = max_val
+            non_red.append(env_node)
+    
+    for node in non_red:
+        sum = 0
+        for red in red_nodes:
+            if nx.has_path(g, node, red):
+                sum += nx.shortest_path_length(g, source=node, target=red) / 2
+        robustness[node] = sum / num_red
+    
+    return robustness
+            
 
 
 
