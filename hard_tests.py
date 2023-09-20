@@ -147,6 +147,7 @@ def greedy_max_metric(g, sys_metric):
 
     return transitions
 
+# memoryless
 def myopic_robustness_minimization(g, env_robustness):
     '''
     Takes in a graph `g` and a robustness measure on the environment nodes 
