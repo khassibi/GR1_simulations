@@ -1,5 +1,40 @@
 import networkx as nx
 
+def num_red_successors(g):
+    sys_nodes = [node for node in g.nodes if 'box' in g.nodes[node]['shape']]
+    value = dict()
+    max_val = len(g.nodes) + 1
+
+    for sys_node in sys_nodes:
+        if 'color' in g.nodes[sys_node] and g.nodes[sys_node]['color'] == 'red':
+            value[sys_node] = max_val
+        else:
+            count = 0
+            for sys_action in list(g.successors(sys_node)):
+                if 'color' in g.nodes[sys_action] and g.nodes[sys_action]['color'] == 'red':
+                    count += 1
+            value[sys_node] = count
+    
+    return value
+
+def percent_red_successors(g):
+    sys_nodes = [node for node in g.nodes if 'box' in g.nodes[node]['shape']]
+    value = dict()
+    max_val = 1
+
+    for sys_node in sys_nodes:
+        if 'color' in g.nodes[sys_node] and g.nodes[sys_node]['color'] == 'red':
+            value[sys_node] = max_val
+        else:
+            count = 0
+            sys_actions = list(g.successors(sys_node))
+            for sys_action in sys_actions:
+                if 'color' in g.nodes[sys_action] and g.nodes[sys_action]['color'] == 'red':
+                    count += 1
+            value[sys_node] = count / len(sys_actions)
+    
+    return value
+
 def greedy_most_red(g):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
     transitions = dict()
@@ -211,7 +246,7 @@ def average_robustness(g, ctrl):
 
 
 # Value iteration for robustness
-def value_iteration_robustness(g, ctrl):
+# def value_iteration_robustness(g, ctrl):
     # Start at the unsafe nodes, give them robustnesses of 0
     # Look at their immediate ancestor 
         # If the ancestor is a env node (oval), then make the robustness of this node the same as the current robustness

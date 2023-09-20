@@ -1,6 +1,6 @@
 from left_turn_pedestrian.controller import sys_ctrl
 import pickle
-import hardest_tests
+import hard_tests
 import random
 import visualization.animate as animate
 
@@ -89,7 +89,7 @@ def experiment():
             ctrl.nodes[edge[1]][key] = val
     
     # Conversions
-    light_conversion = ["g", "y", "r"]
+    light_conversion = ["g1", "g2", "g3", "y1", "y2", "r"] # TODO: Double check this conversion
     loc_conversion = ['c4', 'c7', 'c8', 'c9']
     for node in G.nodes:
         G.nodes[node]['loc'] = loc_conversion[G.nodes[node]['loc']]
@@ -102,7 +102,7 @@ def experiment():
             if (G.nodes[node]['p'] == 4 or G.nodes[node]['vh'] == 4 
             or G.nodes[node]['p'] == 5 or G.nodes[node]['vh'] == 5):
                 unsafe_env_nodes.add(node)
-        if G.nodes[node]['light'] == 'y':
+        if G.nodes[node]['light'] == 'y2':
             if G.nodes[node]['p'] == 4 or G.nodes[node]['vh'] == 4:
                 unsafe_env_nodes.add(node)
     G.remove_nodes_from(unsafe_env_nodes)
@@ -116,28 +116,32 @@ def experiment():
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Most Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_most_red, 20)
+    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_most_red, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Percent Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_percent_red, 20)
+    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_percent_red, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
     title = "Greedy Min Robustness"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.greedy_min_robustness, 20)
+    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_min_robustness, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "BFS Most Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_most_red, 20)
+    title = "Greedy Average Robustness"
+    vh_signal, p_signal, light_signal = test(G, 0, hard_tests.greedy_average_robustness, 20)
     animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    title = "BFS Percent Red"
-    vh_signal, p_signal, light_signal = test(G, 0, hardest_tests.BFS_percent_red, 20)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    # title = "BFS Most Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hard_tests.BFS_most_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
 
-    # print(hardest_tests.average_robustness(G, ctrl))
+    # title = "BFS Percent Red"
+    # vh_signal, p_signal, light_signal = test(G, 0, hard_tests.BFS_percent_red, 20)
+    # animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    # print(hard_tests.average_robustness(G, ctrl))
 
 
 if __name__ == "__main__":

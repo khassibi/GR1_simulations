@@ -1,6 +1,6 @@
 from left_turn.controller import sys_ctrl
 import pickle
-import hardest_tests
+import hard_tests
 import random
 import visualization.animate as animate
 
@@ -103,25 +103,25 @@ def experiment():
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Most Red"
-    vh_signal, light_signal = test(G, 0, hardest_tests.greedy_most_red, 20)
+    vh_signal, light_signal = test(G, 0, hard_tests.greedy_most_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
     # Running the test that greedily picks the next state with the most unsafe 
     # nodes
     title = "Greedy Percent Red"
-    vh_signal, light_signal = test(G, 0, hardest_tests.greedy_percent_red, 20)
+    vh_signal, light_signal = test(G, 0, hard_tests.greedy_percent_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
     title = "Greedy Min Robustness"
-    vh_signal, light_signal = test(G, 0, hardest_tests.greedy_min_robustness, 20)
+    vh_signal, light_signal = test(G, 0, hard_tests.greedy_min_robustness, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
     title = "BFS Most Red"
-    vh_signal, light_signal = test(G, 0, hardest_tests.BFS_most_red, 20)
+    vh_signal, light_signal = test(G, 0, hard_tests.BFS_most_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
     title = "BFS Percent Red"
-    vh_signal, light_signal = test(G, 0, hardest_tests.BFS_percent_red, 20)
+    vh_signal, light_signal = test(G, 0, hard_tests.BFS_percent_red, 20)
     animate_test(ctrl, vh_signal, light_signal, title)
 
 
