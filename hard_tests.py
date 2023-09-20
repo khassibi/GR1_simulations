@@ -135,16 +135,37 @@ def greedy_max_metric(g, sys_metric):
     env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
 
     for env_node in env_nodes:
-        max = -1
+        max_val = -1
         actions = []
         for sys_node in list(g.successors(env_node)):
-            if sys_metric[sys_node] > max:
-                max = sys_metric[sys_node]
+            if sys_metric[sys_node] > max_val:
+                max_val = sys_metric[sys_node]
                 actions = [sys_node]
-            elif sys_metric[sys_node] == max:
+            elif sys_metric[sys_node] == max_val:
                 actions.append(sys_node)
         transitions[env_node] = actions
 
     return transitions
 
+def myopic_robustness_minimization(g, env_robustness):
+    assert(type(env_robustness) == dict)
+    transitions = dict()
+    env_nodes = [node for node in g.nodes if 'oval' in g.nodes[node]['shape']]
 
+    infinity_ish = len(g.nodes) + 1
+    for env_node in env_nodes:
+        min_rob = infinity_ish
+        actions = []
+        for sys_suc in list(g.successors(env_node)):
+            max_rob = -1
+            for env_suc in list(g.successors(sys_suc)):
+                max_rob = max(max_rob, env_robustness[env_suc])
+        if max_rob < min_rob:
+            min_rob = max_rob
+            actions = [sys_suc]
+        elif max_rob == min_rob:
+            actions.append(sys_suc)
+        transitions[env_node] = actions
+    
+    return transitions
+            
