@@ -72,6 +72,8 @@ def experiment():
         # No being collided into
         # '!(a4 & X(vh = 4))',
         # '!(a4 & X(p = 4))',
+        '!(a4 & vh = 3)',
+        '!(a4 & p = 3)',
         # No running a red
         '!(light="r" & (a4 || a8))'
     }
