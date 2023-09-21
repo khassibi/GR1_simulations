@@ -12,7 +12,42 @@ import networkx as nx
 
 path = 'left_turn_pedestrian/'
 
-def test_with_metric(G, init_node, test, metric, max_runs):
+def rand_tests(G, ctrl):
+    # Running the test that greedily picks the next state with the most unsafe 
+    # nodes
+    title = "Memoryless Most Red"
+    num_red_sys_metric = hard_tests.find_num_red_successors(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_max_metric, num_red_sys_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    # Running the test that greedily picks the next state with the most unsafe 
+    # nodes
+    title = "Memoryless Percent Red"
+    percent_red_sys_metric = hard_tests.find_percent_red_successors(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_max_metric, percent_red_sys_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    title = "Memoryless Min Robustness - Minimizing"
+    min_robustness_env_metric = hard_tests.find_min_robustness(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_robustness_minimization, min_robustness_env_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    title = "Memoryless Average Robustness - Minimizing"
+    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_robustness_minimization, avg_robustness_env_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    title = "Memoryless Min Robustness - Averaging"
+    min_robustness_env_metric = hard_tests.find_min_robustness(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_robustness_averaging, min_robustness_env_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+    title = "Memoryless Average Robustness - Averaging"
+    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
+    vh_signal, p_signal, light_signal = rand_test_with_metric(G, 0, hard_tests.memoryless_robustness_averaging, avg_robustness_env_metric, 30)
+    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+
+def rand_test_with_metric(G, init_node, test, metric, max_runs):
     curr_num = init_node
 
     # Initializing the initial state
@@ -34,8 +69,8 @@ def test_with_metric(G, init_node, test, metric, max_runs):
     env_state.update({'vh': vh, "p": p, 'light': light, 'shape': 'oval'})
     assert env_state == init_state, (env_state, init_state)
 
-    # curr_num = random.choice(test_transitions[curr_num])
-    curr_num = test_transitions[curr_num][0]
+    curr_num = random.choice(test_transitions[curr_num])
+    # curr_num = test_transitions[curr_num][0]
 
     # Running the test
     counter = 0
@@ -75,7 +110,7 @@ def animate_test(ctrl, vh_signal, p_signal, light_signal, title):
                                         title)
     anim.save(path + title + '.gif')
 
-def experiment():
+def organize_graph_and_controller():
     # Load the graph from the saved file
     with open(path + 'graph', "rb") as file:
         G = pickle.load(file)
@@ -114,39 +149,12 @@ def experiment():
     mapping = dict(zip(nodes, new_labels))
     G = nx.relabel_nodes(G, mapping)
 
-    # Running the test that greedily picks the next state with the most unsafe 
-    # nodes
-    title = "Memoryless Most Red"
-    num_red_sys_metric = hard_tests.find_num_red_successors(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_max_metric, num_red_sys_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    return G, ctrl
 
-    # Running the test that greedily picks the next state with the most unsafe 
-    # nodes
-    title = "Memoryless Percent Red"
-    percent_red_sys_metric = hard_tests.find_percent_red_successors(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_max_metric, percent_red_sys_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+def experiment():
+    G, ctrl = organize_graph_and_controller()
 
-    title = "Memoryless Min Robustness - Minimizing"
-    min_robustness_env_metric = hard_tests.find_min_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_robustness_minimization, min_robustness_env_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
-
-    title = "Memoryless Average Robustness - Minimizing"
-    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_robustness_minimization, avg_robustness_env_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
-
-    title = "Memoryless Min Robustness - Averaging"
-    min_robustness_env_metric = hard_tests.find_min_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_robustness_averaging, min_robustness_env_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
-
-    title = "Memoryless Average Robustness - Averaging"
-    avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
-    vh_signal, p_signal, light_signal = test_with_metric(G, 0, hard_tests.memoryless_robustness_averaging, avg_robustness_env_metric, 30)
-    animate_test(ctrl, vh_signal, p_signal, light_signal, title)
+    rand_tests(G, ctrl)
 
 
 if __name__ == "__main__":
