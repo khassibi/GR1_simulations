@@ -1,7 +1,7 @@
 import networkx as nx
 
 # Finding the metrics
-def num_red_successors(g):
+def find_num_red_successors(g):
     '''
     Taking in graph `g` and returning a dictionary of the number of unsafe actions
     that each system node has.
@@ -25,7 +25,7 @@ def num_red_successors(g):
     
     return value
 
-def percent_red_successors(g):
+def find_percent_red_successors(g):
     '''
     Taking in graph `g` and returning a dictionary of the percent of unsafe 
     actions that each system node has.
@@ -124,7 +124,7 @@ def find_avg_robustness(g):
 
 
 # Creating the tests
-def greedy_max_metric(g, sys_metric):
+def memoryless_max_metric(g, sys_metric):
     '''
     Takes in a graph `g` and a metric on the system nodes `sys_metric`. 
     At each environment node, the environment transitions to the system
@@ -147,8 +147,7 @@ def greedy_max_metric(g, sys_metric):
 
     return transitions
 
-# memoryless
-def myopic_robustness_minimization(g, env_robustness):
+def memoryless_robustness_minimization(g, env_robustness):
     '''
     Takes in a graph `g` and a robustness measure on the environment nodes 
     `env_robustness`.
@@ -178,7 +177,7 @@ def myopic_robustness_minimization(g, env_robustness):
     
     return transitions
             
-def myopic_robustness_averaging(g, env_robustness):
+def memoryless_robustness_averaging(g, env_robustness):
     '''
     Takes in a graph `g` and a robustness measure on the environment nodes 
     `env_robustness`.
