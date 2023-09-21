@@ -95,6 +95,54 @@ def rand_test_with_metric(G, init_node, test, metric, max_runs):
     
     return vh_signal, p_signal, light_signal
 
+def run_every_test(G, init_node, test, metric, max_runs):
+    curr_num = init_node
+
+    # Initializing the initial state
+    init_state = G.nodes[curr_num]
+    vh = init_state['vh']
+    p = init_state['p']
+    light = init_state['light']
+    
+    # Initializing signals
+    vh_signal = [vh]
+    p_signal = [p]
+    light_signal = [light]
+
+    # Finding the transitions for the test
+    test_transitions = test(G, metric)
+    
+    sys_control = sys_ctrl()
+    env_state = sys_ctrl.move(sys_control, vh, p, light)
+    env_state.update({'vh': vh, "p": p, 'light': light, 'shape': 'oval'})
+    assert env_state == init_state, (env_state, init_state)
+
+    curr_num = random.choice(test_transitions[curr_num])
+    # curr_num = test_transitions[curr_num][0]
+
+    # Running the test
+    counter = 0
+    while env_state['a9'] == False and counter < max_runs:
+        sys_state = G.nodes[curr_num]
+        vh = sys_state['vh']
+        p = sys_state['p']
+        light = sys_state['light']
+
+        # Keeping track of signals
+        vh_signal.append(vh)
+        p_signal.append(p)
+        light_signal.append(light)
+
+        env_state = sys_ctrl.move(sys_control, vh, p, light)
+        env_state.update({'vh': vh, "p": p, 'light': light, 'shape': 'oval'})
+
+        curr_num = list(G.nodes.values()).index(env_state)
+
+        curr_num = random.choice(test_transitions[curr_num])
+        counter += 1
+    
+    return vh_signal, p_signal, light_signal
+
 def animate_test(ctrl, vh_signal, p_signal, light_signal, title):
     time, states = ctrl.run('Sinit', {'light': light_signal, 'vh': vh_signal, 
                                       'p': p_signal})
@@ -154,7 +202,7 @@ def organize_graph_and_controller():
 def experiment():
     G, ctrl = organize_graph_and_controller()
 
-    rand_tests(G, ctrl)
+    
 
 
 if __name__ == "__main__":
