@@ -99,12 +99,17 @@ def experiment():
     attributes = ['color', 'shape']
 
     # Making a graph of the asynchronous GR(1) game with deadends.
-    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
-    h0 = gb._game_format_nx(g0, attributes)
-    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
-    pd0.write_pdf(path + 'game.pdf')
+    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, append_non_visited=True, qinit=aut.qinit)
+    print('got here')
     with open(filename, "wb") as file:
         pickle.dump(g0, file)
+    print('dumped')
+    h0 = gb._game_format_nx(g0, attributes)
+    print('did h0')
+    pd0 = nx.drawing.nx_pydot.to_pydot(h0)
+    print('did pd0')
+    pd0.write_pdf(path + 'game.pdf')
+    print('wrote pd0')
     
     # # Making a graph of the asynchronous GR(1) game without deadends.
     # g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)

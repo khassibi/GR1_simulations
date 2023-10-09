@@ -125,7 +125,7 @@ def _exist_forall_init(g, aut, umap, keys):
         visited = enum._add_to_visited(d, visited, aut)
     return queue, visited
 
-def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
+def game_graph(aut, env, sys, remove_deadends, append_non_visited=False, qinit='\A \A'):
     _aut = copy.copy(aut)
     _aut.moore = aut.moore
     _aut.plus_one = aut.plus_one
@@ -139,13 +139,15 @@ def game_graph(aut, env, sys, remove_deadends, qinit='\A \A'):
         env=aut.action[env],
         sys=aut.action[sys])
     _aut.prime_varlists()
-    g = _game_graph(_aut, qinit)
+    g = _game_graph(_aut, qinit, append_non_visited)
     if remove_deadends:
         return _remove_deadends(g)
     return g
 
-def _game_graph(aut, qinit):
+def _game_graph(aut, qinit, append_non_visited):
+    print('about to create game graph')
     winning_set, _, __ = gr1.solve_streett_game(aut)
+    print('found winning set')
 
     assert aut.action['sys'] != aut.false
     primed_vars = enum._primed_vars_per_quantifier(aut.varlist)
@@ -161,7 +163,12 @@ def _game_graph(aut, qinit):
     varnames = set(vrs)
     symbolic._assert_support_moore(aut.action['sys'], aut)
     # search
+    print('before queue')
+    added_to_queue = set(queue)
+    iter = 0
     while queue:
+        iter += 1
+        # print(len(added_to_queue), iter)
         node = queue.pop()
         values = {key: val for key, val in g.nodes[node].items() 
                   if key not in ['color', 'shape']}
@@ -236,11 +243,16 @@ def _game_graph(aut, qinit):
                     g.nodes[sys_node]['color'] = 'red'
                 if not already_visited:
                     visited = enum._add_to_visited(d, visited, aut)
+                    if append_non_visited:
+                        queue.append(sys_node)
+                        added_to_queue.add(sys_node)
                 # Add a system node to the queue as long as the transition to it is unique
                 if not g.has_edge(env_node, sys_node, key='sys'):
                     c = remove_redundant_propositions(next_sys)
                     g.add_edge(env_node, sys_node, key="sys", color='blue', label=c)
-                    queue.append(sys_node)
+                    if not append_non_visited:
+                        queue.append(sys_node)
+                        added_to_queue.add(sys_node)
 
                 log.debug((
                     'next env: {e}\n'

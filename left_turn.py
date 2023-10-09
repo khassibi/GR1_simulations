@@ -93,18 +93,45 @@ def experiment():
     attributes = ['color', 'shape']
     
     # Making a graph of the asynchronous GR(1) game with deadends.
-    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, qinit=aut.qinit)
+    g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, append_non_visited=False, qinit=aut.qinit)
     h0 = gb._game_format_nx(g0, attributes)
     pd0 = nx.drawing.nx_pydot.to_pydot(h0)
     pd0.write_pdf(path + 'game.pdf')
     with open(filename, "wb") as file:
         pickle.dump(g0, file)
+    
+    new_g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, append_non_visited=True, qinit=aut.qinit)
+    new_h0 = gb._game_format_nx(new_g0, attributes)
+    new_pd0 = nx.drawing.nx_pydot.to_pydot(new_h0)
+    new_pd0.write_pdf(path + 'new_game.pdf')
+
+    if nx.is_isomorphic(g0, new_g0):
+        print('g0 ismorphic to new_g0')
+    else:
+        print("g0.number_of_edges():", g0.number_of_edges())
+        print("new_g0.number_of_edges():", new_g0.number_of_edges())
+        print("g0.number_of_nodes():", g0.number_of_nodes())
+        print("new_g0.number_of_nodes():", new_g0.number_of_nodes())
+        
 
     # Making a graph of the asynchronous GR(1) game without deadends.
-    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
+    g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, append_non_visited=False, qinit=aut.qinit)
     h1 = gb._game_format_nx(g1, attributes)
     pd1 = nx.drawing.nx_pydot.to_pydot(h1)
     pd1.write_pdf(path + 'game_no_deadends.pdf')
+
+    new_g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, append_non_visited=True, qinit=aut.qinit)
+    new_h1 = gb._game_format_nx(new_g1, attributes)
+    new_pd1 = nx.drawing.nx_pydot.to_pydot(new_h1)
+    new_pd1.write_pdf(path + 'new_game_no_deadends.pdf')
+
+    if nx.is_isomorphic(g1, new_g1):
+        print('g1 ismorphic to new_g1')
+    else:
+        print("g1.number_of_edges():", g1.number_of_edges())
+        print("new_g1.number_of_edges():", new_g1.number_of_edges())
+        print("g1.number_of_nodes():", g1.number_of_nodes())
+        print("new_g1.number_of_nodes():", new_g1.number_of_nodes())
 
     # Making a graph pf the state transitions of the environment and system
     g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)

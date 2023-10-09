@@ -114,6 +114,19 @@ def experiment():
     pd0.write_pdf(path + 'game.pdf')
     with open(filename, "wb") as file:
         pickle.dump(g0, file)
+    
+    new_g0 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=False, append_non_visited=True, qinit=aut.qinit)
+    new_h0 = gb._game_format_nx(new_g0, attributes)
+    new_pd0 = nx.drawing.nx_pydot.to_pydot(new_h0)
+    new_pd0.write_pdf(path + 'new_game.pdf')
+
+    if nx.is_isomorphic(g0, new_g0):
+        print('g0 ismorphic to new_g0')
+    else:
+        print("g0.number_of_edges():", g0.number_of_edges())
+        print("new_g0.number_of_edges():", new_g0.number_of_edges())
+        print("g0.number_of_nodes():", g0.number_of_nodes())
+        print("new_g0.number_of_nodes():", new_g0.number_of_nodes())
 
     # # Making a graph of the asynchronous GR(1) game without deadends.
     # g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
