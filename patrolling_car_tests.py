@@ -92,15 +92,13 @@ def rand_test_with_metric(G, init_node, test, metric, max_runs):
 def animate_test(ctrl, b_signal, title):
     time, states = ctrl.run('Sinit', {'b': b_signal})
 
-    # Grab the location
-    va_path = states['loc']
-    vh_path = ['c'+str(i) for i in vh_signal]
-    p_path = ['c'+str(i) for i in p_signal]
-    light_path = light_signal
+    car_path = states['r']
+    fuel_path = states['fuel']
+    b_conversion = ['c10', 'c11', 'c12', 'c13', 'c14']
+    b_path = [b_conversion[b] for b in b_signal]
 
     # Animate the results
-    anim = animate.animate_intersection(light_path, (va_path, vh_path, p_path),
-                                        title)
+    anim = animate.animate_pat_car(fuel_path, (car_path, b_path), title)
     anim.save(path + title + '.gif')
 
 def organize_graph_and_controller():
