@@ -57,7 +57,7 @@ def experiment():
 
     sys_safe |= {'(r="c42") -> (fuel = 8)', # TODO: make sure this works
                     '(fuel=1) -> X(!move & fuel=1)',
-                    '(move && fuel<=2 && fuel<8 && !X(r="c42")) -> (X(fuel) = fuel - 1)',
+                    '(move && fuel>=2 && fuel<8 && !X(r="c42")) -> (X(fuel) = fuel - 1)',
                     '(move && fuel=8 && !X(r="c42")) -> X(fuel = 7)'
         }
     for i in range(0,5):

@@ -71,7 +71,7 @@ def rand_test_with_metric(G, init_node, test, metric, max_runs):
 
     # Running the test
     counter = 0
-    while env_state['r'] != 4 and counter < max_runs:
+    while env_state['r'] != 'c04' and counter < max_runs:
         sys_state = G.nodes[curr_num]
         b = sys_state['b']
 
