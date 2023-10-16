@@ -89,9 +89,8 @@ def rand_test_with_metric(G, init_node, test, metric, max_runs):
     
     return b_signal, trajectory
 
-def animate_test(ctrl, vh_signal, p_signal, light_signal, title):
-    time, states = ctrl.run('Sinit', {'light': light_signal, 'vh': vh_signal, 
-                                      'p': p_signal})
+def animate_test(ctrl, b_signal, title):
+    time, states = ctrl.run('Sinit', {'b': b_signal})
 
     # Grab the location
     va_path = states['loc']
