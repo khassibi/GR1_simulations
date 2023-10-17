@@ -40,24 +40,24 @@ def experiment():
     sys_safe = set()
 
     for x in range(1,4):
-        sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,0, x-1,0, x+1,0, x,1),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,4, x-1,4, x+1,4, x,3),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(0,x, 0,x+1, 0,x-1, 1,x),
-                    '(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(4,x, 4,x+1, 4,x-1, 3,x)
+        sys_safe |= {'(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,0, x,0, x-1,0, x+1,0, x,1),
+                    '(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,4,x,4, x-1,4, x+1,4, x,3),
+                    '(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(0,x,0,x, 0,x+1, 0,x-1, 1,x),
+                    '(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(4,x,4,x, 4,x+1, 4,x-1, 3,x)
         }
         for y in range(1,4):
-            sys_safe |= {'(r="c{}{}") -> (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
+            sys_safe |= {'(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,y,x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
 
     # Corners
-    sys_safe |= {'(r="c00") -> (X((r="c10") | (r="c01")) & X move)',
-                '(r="c40") -> (X((r="c30") | (r="c41")) & X move)',
-                '(r="c44") -> (X((r="c34") | (r="c43")) & X move)',
-                '(r="c04") -> (X((r="c03") | (r="c14")) & X move)'
+    sys_safe |= {'(r="c00") -> (r="c00") | (X((r="c10") | (r="c01")) & X move)',
+                '(r="c40") -> (r="c40") | (X((r="c30") | (r="c41")) & X move)',
+                '(r="c44") -> (r="c44") | (X((r="c34") | (r="c43")) & X move)',
+                '(r="c04") -> (r="c04") | (X((r="c03") | (r="c14")) & X move)'
     }
 
     sys_safe |= {'X(r="c42") -> X(fuel = 8)', # TODO: make sure this works
                 #  '((r="c42") & move) -> X(fuel = (fuel - 1))',
-                'X(fuel >= -1)',
+                'X(fuel > -1)',
                 '((X move) && (fuel=8) && !X(r="c42")) -> X(fuel = 7)',
                 '((X move) && (fuel=7) && !X(r="c42")) -> X(fuel = 6)',
                 '((X move) && (fuel=6) && !X(r="c42")) -> X(fuel = 5)',
