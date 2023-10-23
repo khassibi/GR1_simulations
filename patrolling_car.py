@@ -33,10 +33,17 @@ def experiment():
     }
 
     # Safety
-    env_safe = {'(b=0) -> X((b=0) | (b=1))', 
-                '(b=4) -> X((b=3) | (b=4))'}
+    # # Blocker can self-loop
+    # env_safe = {'(b=0) -> X((b=0) | (b=1))', 
+    #             '(b=4) -> X((b=3) | (b=4))'}
+    # for i in range(1,4):
+    #     env_safe |= {'(b={0}) -> X((b={0}) | (b={1}) | (b={2}))'.format(i, i-1, i+1)}
+
+    # Blocker cannot self-loop
+    env_safe = {'(b=0) -> X(b=1)', 
+                '(b=4) -> X(b=3)'}
     for i in range(1,4):
-        env_safe |= {'(b={0}) -> X((b={0}) | (b={1}) | (b={2}))'.format(i, i-1, i+1)}
+        env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
 
     sys_safe = set()
 
@@ -47,7 +54,7 @@ def experiment():
                     '(r="c{}{}") -> (X(r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move))'.format(4,x,4,x, 4,x+1, 4,x-1, 3,x)
         }
         for y in range(1,4):
-            sys_safe |= {'(r="c{}{}") -> (r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move)'.format(x,y,x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
+            sys_safe |= {'(r="c{}{}") -> (X(r="c{}{}") | (X((r="c{}{}") | (r="c{}{}") | (r="c{}{}") | (r="c{}{}")) & X move))'.format(x,y,x,y, x+1,y, x-1,y, x,y+1, x,y-1)}
 
     # Corners
     sys_safe |= {'(r="c00") -> (X(r="c00") | (X((r="c10") | (r="c01")) & X move))',
