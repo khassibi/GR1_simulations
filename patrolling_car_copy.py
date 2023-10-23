@@ -106,7 +106,7 @@ def experiment():
                 '(!(X move) && (fuel=2)) -> X(fuel = 2)',
                 '(!(X move) && (fuel=1)) -> X(fuel = 1)',
                 '(!(X move) && (fuel=0)) -> X(fuel = 0)',
-                '(!(X move) && (fuel=-1)) -> X(fuel = -1)',
+                '(!(X move) && (fuel=-1)) -> X(fuel = -1)'
         }
     for i in range(0,5):
         sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i),
