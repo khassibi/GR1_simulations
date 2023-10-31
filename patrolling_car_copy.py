@@ -10,7 +10,7 @@ from tulip import dumpsmach
 import pickle
 
 def experiment():
-    path = 'patrolling_car_copy/'
+    path = 'pat_car_cop2/'
 
     # Define the states of the system
     states = []
@@ -36,17 +36,17 @@ def experiment():
     }
 
     # Safety
-    # # Blocker can self-loop
-    # env_safe = {'(b=0) -> X((b=0) | (b=1))', 
-    #             '(b=4) -> X((b=3) | (b=4))'}
-    # for i in range(1,4):
-    #     env_safe |= {'(b={0}) -> X((b={0}) | (b={1}) | (b={2}))'.format(i, i-1, i+1)}
-
-    # Blocker cannot self-loop
-    env_safe = {'(b=0) -> X(b=1)', 
-                '(b=4) -> X(b=3)'}
+    # Blocker can self-loop (in pat_car_cop2)
+    env_safe = {'(b=0) -> X((b=0) | (b=1))', 
+                '(b=4) -> X((b=3) | (b=4))'}
     for i in range(1,4):
-        env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
+        env_safe |= {'(b={0}) -> X((b={0}) | (b={1}) | (b={2}))'.format(i, i-1, i+1)}
+
+    # Blocker cannot self-loop (in patrolling_car_copy)
+    # env_safe = {'(b=0) -> X(b=1)', 
+    #             '(b=4) -> X(b=3)'}
+    # for i in range(1,4):
+    #     env_safe |= {'(b={0}) -> X((b={1}) | (b={2}))'.format(i, i-1, i+1)}
 
     sys_safe = set()
 
