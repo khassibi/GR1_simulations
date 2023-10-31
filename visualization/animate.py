@@ -126,7 +126,7 @@ def _plot_grid_car(ax, xmin, xmax, ymin, ymax, labels):
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
 
-def animate_pat_car(fuel, paths, title):
+def animate_pat_car(fuel, paths, title, max_fuel):
     colors = "bgcmyk"
     fig, ax = plt.subplots()
     fig.suptitle(title)
@@ -143,16 +143,6 @@ def animate_pat_car(fuel, paths, title):
     for x in range(xmin, xmax, 1):
         for y in range(ymin, ymax, 1):
             labels['c' + str(x) + str(y)] = (x + 0.5, y + 0.5)
-    # labels = {}
-    # last_idx = -1
-    # for i in range(ymax - ymin):
-    #     last_idx += 1
-    #     labels["c" + str(last_idx)] = (0 + 0.5, ymax - i - 0.5)
-    # for i in range(xmin, 1):
-    #     last_idx += 1
-    #     labels["c" + str(last_idx)] = (1.5, i + 0.5)
-    # last_idx += 1
-    # labels["c" + str(last_idx)] = (-0.5, 1.5)
 
     def init():
         _plot_grid_car(ax, xmin, xmax, ymin, ymax, labels)
@@ -177,148 +167,21 @@ def animate_pat_car(fuel, paths, title):
             else:
                 fuel_marker.set_markerfacecolor('r')
 
-        # if 'g' in light[num]:
-        #     light_marker.set_markerfacecolor("g")
-        #     light_marker.set_markeredgecolor("g")
-        # elif 'y' in light[num]:
-        #     light_marker.set_markerfacecolor("y")
-        #     light_marker.set_markeredgecolor("y")                     
-        # elif 'r' in light[num]:
-        #     light_marker.set_markerfacecolor("r")
-        #     light_marker.set_markeredgecolor("r")
-        # else:
-        #     light_marker.set_markerfacecolor("b")
-        #     light_marker.set_markeredgecolor("b")
-
-        # return path_lines, light_marker
         return path_lines, fuel_marker
 
     path_data = []
     path_lines = []
     fuel_markers = []
-    for i in range(8):
+    for i in range(max_fuel):
         fuel_markers.append(ax.plot(xint, yint + i*0.4, "bs", markersize=20.0, zorder=3)[0])
-    # (fuel_marker,) = ax.plot(xint, yint, "bs", markersize=20.0, zorder=3)
 
     shapes = ['o', 'D']
     for n, path in enumerate(paths):
         arr = np.array([labels[cell] for cell in path]).transpose()
         path_data.append(arr)
-        # (point,) = ax.plot([], [], "o", color=colors[n], markersize=10.0, zorder=2)
         (point,) = ax.plot([], [], shapes[n], color=colors[n], markersize=10.0, zorder=2)
         (path_trail,) = ax.plot([], [], "-", color=colors[n], zorder=1)
         path_lines.append((point, path_trail))
-    
-    # arr = np.array([labels[cell] for cell in path]).transpose()
-    # path_data.append(arr)
-    # (point,) = ax.plot([], [], "o", color=colors[n], markersize=10.0, zorder=2)
-    # (path_trail,) = ax.plot([], [], "-", color=colors[n], zorder=1)
-    # path_lines.append((point, path_trail))
-    
-    # fuel_pie = plt.pie([fuel,8-fuel], colors=['#1f77b4', '#ffffff'], startangle=90, counterclock=True)
-
-    anim = matplotlib.animation.FuncAnimation(
-        fig,
-        update_line,
-        len(paths[0]),
-        init_func=init,
-        # fargs=(path_data, path_lines, light_marker),
-        fargs=(path_data, path_lines, fuel_markers),
-        interval=500,
-    )
-
-    return anim
-
-def animate_pat_car_copy(fuel, paths, title):
-    colors = "bgcmyk"
-    fig, ax = plt.subplots()
-    fig.suptitle(title)
-
-    xmin = 0
-    xmax = 5
-    ymin = 0
-    ymax = 5
-    xint = 6
-    yint = 1
-
-    # The name of the cell and the coordinate of its center
-    labels = {}
-    for x in range(xmin, xmax, 1):
-        for y in range(ymin, ymax, 1):
-            labels['c' + str(x) + str(y)] = (x + 0.5, y + 0.5)
-    # labels = {}
-    # last_idx = -1
-    # for i in range(ymax - ymin):
-    #     last_idx += 1
-    #     labels["c" + str(last_idx)] = (0 + 0.5, ymax - i - 0.5)
-    # for i in range(xmin, 1):
-    #     last_idx += 1
-    #     labels["c" + str(last_idx)] = (1.5, i + 0.5)
-    # last_idx += 1
-    # labels["c" + str(last_idx)] = (-0.5, 1.5)
-
-    def init():
-        _plot_grid_car(ax, xmin, xmax, ymin, ymax, labels)
-
-    def update_line(num, path_dlist, path_lines, fuel_marker):
-        for count, ((point, trail), path_data) in enumerate(zip(path_lines, path_dlist)):
-            shift = 0
-            if count == 2:
-                shift = -0.33
-                point.set_markersize(5)
-            trail.set_data(path_data[..., : num + 1] + [[shift], [0]])
-            point.set_data(path_data[..., num] + [shift, 0])
-        
-        # colors['r','g','b']
-        # fuel_marker.set_markerfacecolor('r')
-        font_pt = 8
-        fuel_txt = ax.text(xmax, ymax, str(fuel), size=font_pt)
-
-        for i, fuel_marker in enumerate(fuel_markers):
-            if i >= fuel[num]:
-                fuel_marker.set_markerfacecolor('w')
-            else:
-                fuel_marker.set_markerfacecolor('r')
-
-        # if 'g' in light[num]:
-        #     light_marker.set_markerfacecolor("g")
-        #     light_marker.set_markeredgecolor("g")
-        # elif 'y' in light[num]:
-        #     light_marker.set_markerfacecolor("y")
-        #     light_marker.set_markeredgecolor("y")                     
-        # elif 'r' in light[num]:
-        #     light_marker.set_markerfacecolor("r")
-        #     light_marker.set_markeredgecolor("r")
-        # else:
-        #     light_marker.set_markerfacecolor("b")
-        #     light_marker.set_markeredgecolor("b")
-
-        # return path_lines, light_marker
-        return path_lines, fuel_marker
-
-    path_data = []
-    path_lines = []
-    fuel_markers = []
-    for i in range(14):
-        fuel_markers.append(ax.plot(xint, yint + i*0.4, "bs", markersize=20.0, zorder=3)[0])
-    # (fuel_marker,) = ax.plot(xint, yint, "bs", markersize=20.0, zorder=3)
-
-    shapes = ['o', 'D']
-    for n, path in enumerate(paths):
-        arr = np.array([labels[cell] for cell in path]).transpose()
-        path_data.append(arr)
-        # (point,) = ax.plot([], [], "o", color=colors[n], markersize=10.0, zorder=2)
-        (point,) = ax.plot([], [], shapes[n], color=colors[n], markersize=10.0, zorder=2)
-        (path_trail,) = ax.plot([], [], "-", color=colors[n], zorder=1)
-        path_lines.append((point, path_trail))
-    
-    # arr = np.array([labels[cell] for cell in path]).transpose()
-    # path_data.append(arr)
-    # (point,) = ax.plot([], [], "o", color=colors[n], markersize=10.0, zorder=2)
-    # (path_trail,) = ax.plot([], [], "-", color=colors[n], zorder=1)
-    # path_lines.append((point, path_trail))
-    
-    # fuel_pie = plt.pie([fuel,8-fuel], colors=['#1f77b4', '#ffffff'], startangle=90, counterclock=True)
 
     anim = matplotlib.animation.FuncAnimation(
         fig,

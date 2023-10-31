@@ -1,4 +1,4 @@
-from patrolling_car.controller import sys_ctrl
+from idling_decrease.controller import sys_ctrl
 import pickle
 import hard_tests
 import random
@@ -98,7 +98,7 @@ def animate_test(ctrl, b_signal, title):
     b_path = [b_conversion[b] for b in b_signal]
 
     # Animate the results
-    anim = animate.animate_pat_car(fuel_path, (car_path, b_path), title)
+    anim = animate.animate_pat_car(fuel_path, (car_path, b_path), title, fuel_path[0])
     anim.save(path + title + '.gif')
 
 def organize_graph_and_controller():

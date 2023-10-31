@@ -69,6 +69,7 @@ def find_min_robustness(g):
         else:
             robustness[env_node] = max_val
 
+    # Start at red nodes and look at their neighbors, so on and so forth
     visited = nodes_to_visit.copy()
     distance = 0
     while nodes_to_visit:
