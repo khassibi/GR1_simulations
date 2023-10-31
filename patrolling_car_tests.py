@@ -119,18 +119,6 @@ def organize_graph_and_controller():
     r_conversion = ['c00', 'c01', 'c02', 'c03', 'c04', 'c10', 'c11', 'c12', 'c13', 'c14', 'c20', 'c21', 'c22', 'c23', 'c24', 'c30', 'c31', 'c32', 'c33', 'c34', 'c40', 'c41', 'c42', 'c43', 'c44'] # TODO: Double check this conversion
     for node in G.nodes:
         G.nodes[node]['r'] = r_conversion[G.nodes[node]['r']]
-    
-    # Removing nodes that violate the environment's safety
-    unsafe_env_nodes = set()
-    for node in G.nodes:
-        if G.nodes[node]['light'] == 'r':
-            if (G.nodes[node]['p'] == 4 or G.nodes[node]['vh'] == 4 
-            or G.nodes[node]['p'] == 5 or G.nodes[node]['vh'] == 5):
-                unsafe_env_nodes.add(node)
-        if G.nodes[node]['light'] == 'y2':
-            if G.nodes[node]['p'] == 4 or G.nodes[node]['vh'] == 4:
-                unsafe_env_nodes.add(node)
-    G.remove_nodes_from(unsafe_env_nodes)
 
     # Relabeling the nodes in order
     nodes = list(G.nodes)

@@ -1,4 +1,4 @@
-from pat_car_cop2.controller import sys_ctrl
+from patrolling_car.controller import sys_ctrl
 import pickle
 import hard_tests
 import random
@@ -10,7 +10,7 @@ from IPython.display import HTML
 
 import networkx as nx
 
-path = 'pat_car_cop2/'
+path = 'idling_decrease/'
 
 def rand_tests(G, ctrl):
     # Running the test that greedily picks the next state with the most unsafe 
@@ -98,7 +98,7 @@ def animate_test(ctrl, b_signal, title):
     b_path = [b_conversion[b] for b in b_signal]
 
     # Animate the results
-    anim = animate.animate_pat_car_copy(fuel_path, (car_path, b_path), title)
+    anim = animate.animate_pat_car(fuel_path, (car_path, b_path), title)
     anim.save(path + title + '.gif')
 
 def organize_graph_and_controller():
