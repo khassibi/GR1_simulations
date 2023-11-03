@@ -1,0 +1,288 @@
+
+------
+rb_aug_moore_plus_one_primed_EA
+------
+rb_aug_moore_plus_one_primed_AE
+------
+rb_aug_moore_plus_one_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_plus_one_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_plus_one_primed_EA
+------
+rb_aug_mealy_plus_one_primed_AE
+------
+rb_aug_mealy_plus_one_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_plus_one_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_primed_EA
+------
+rb_aug_moore_primed_AE
+------
+rb_aug_moore_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_primed_EA
+------
+rb_aug_mealy_primed_AE
+------
+rb_aug_mealy_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_primed_EA
+------
+rb_moore_plus_one_primed_AE
+------
+rb_moore_plus_one_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_primed_EA
+------
+rb_mealy_plus_one_primed_AE
+------
+rb_mealy_plus_one_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_moore_primed_EA
+------
+rb_moore_primed_AE
+------
+rb_moore_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_primed_EA
+------
+rb_mealy_primed_AE
+------
+rb_mealy_primed_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_primed_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_plus_one_EA
+------
+rb_aug_moore_plus_one_AE
+------
+rb_aug_moore_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_plus_one_EA
+------
+rb_aug_mealy_plus_one_AE
+------
+rb_aug_mealy_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_EA
+------
+rb_aug_moore_AE
+------
+rb_aug_moore_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_moore_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_EA
+------
+rb_aug_mealy_AE
+------
+rb_aug_mealy_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_aug_mealy_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_EA
+------
+rb_moore_plus_one_AE
+------
+rb_moore_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_EA
+------
+rb_mealy_plus_one_AE
+------
+rb_mealy_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_moore_EA
+------
+rb_moore_AE
+------
+rb_moore_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_EA
+------
+rb_mealy_AE
+------
+rb_mealy_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError

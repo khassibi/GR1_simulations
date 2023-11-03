@@ -5,6 +5,7 @@ from tulip.transys import machines
 from tulip import dumpsmach
 import pickle
 import simulations
+import traceback
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -92,17 +93,25 @@ class RunnerBlocker(simulations.Simulation):
 if __name__ == '__main__':
     path = 'runner_blocker/'
     sims = []
+    asrts = open(path + "asrts.txt", "w")
     f = open(path + "runs.txt", "w")
     f.write("The simulations of runner blocker that have a realizable controller\n")
     for aug in [True, False]:
         for primed in [True, False]:
             for plus_one in [True, False]:
                 for moore in [True, False]:
-                    for qinit in ['\E \A', '\A \E']: #, '\A \A', '\E \E']:
+                    for qinit in ['\E \A', '\A \E', '\A \A', '\E \E']:
                         run = RunnerBlocker(plus_one, moore, qinit, aug, primed)
                         run.give_name('rb')
                         run.make_specs()
-                        run.make_strat(path)
+                        asrts.write('\n------\n')
+                        asrts.write(run.name)
+                        try:
+                            run.make_strat(path)
+                        except Exception as e:
+                            # asrts.write(f"\nError: {type(e).__name__}")
+                            asrts.write('\n' + str(traceback.format_exc(-1)))
+
                         sims.append(run)
                         if run.realizable:
                             f.write('\n------\n')

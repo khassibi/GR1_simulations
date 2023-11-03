@@ -5,6 +5,10 @@ rb_aug_mealy_primed_EA
 ------
 rb_aug_mealy_primed_AE
 ------
+rb_mealy_primed_EA
+------
+rb_mealy_primed_AE
+------
 rb_aug_moore_plus_one_EA
 ------
 rb_aug_moore_plus_one_AE
@@ -20,10 +24,6 @@ rb_aug_moore_AE
 rb_aug_mealy_EA
 ------
 rb_aug_mealy_AE
-------
-rb_mealy_primed_EA
-------
-rb_mealy_primed_AE
 ------
 rb_mealy_plus_one_EA
 ------
