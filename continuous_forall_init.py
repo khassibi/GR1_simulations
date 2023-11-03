@@ -18,7 +18,7 @@ from tulip import hybrid, spec, synth
 from tulip.abstract import prop2part, discretize
 from tulip.abstract.plot import plot_partition
 from tulip.abstract import find_controller
-from tulip.abstract.plot import simulate2d, pick_point_in_polytope
+# from tulip.abstract.plot import simulate2d, pick_point_in_polytope
 
 
 logging.basicConfig(level='WARNING')
@@ -83,42 +83,42 @@ ctrl = synth.synthesize(specs,
                         sys=disc_dynamics.ts,
                         ignore_sys_init=False)
 assert ctrl is not None, 'unrealizable'
-# Generate a graphical representation of the controller for viewing
-if not ctrl.save('continuous.png'):
-    print(ctrl)
-#
-# Simulation
-print('\n Simulation starts \n')
-T = 100
-# let us pick an environment signal
-env_inputs = [{'park': random.randint(0, 1)} for b in range(T + 1)]
+# # Generate a graphical representation of the controller for viewing
+# if not ctrl.save('continuous.png'):
+#     print(ctrl)
+# #
+# # Simulation
+# print('\n Simulation starts \n')
+# T = 100
+# # let us pick an environment signal
+# env_inputs = [{'park': random.randint(0, 1)} for b in range(T + 1)]
 
-# Set up parameters for get_input()
-disc_dynamics.disc_params['conservative'] = True
-disc_dynamics.disc_params['closed_loop'] = False
-
-
-def pick_initial_state(ctrl, disc_dynamics):
-    """Construct initial discrete and continuous state
-
-    for `qinit == '\A \A'`.
-    """
-    # pick initial discrete state
-    init_edges = ctrl.edges('Sinit', data=True)
-    u, v, edge_data = next(iter(init_edges))
-    assert u == 'Sinit', u
-    d_init = edge_data
-    # pick initial continuous state
-    s0_part = edge_data['loc']
-    init_poly = disc_dynamics.ppp.regions[s0_part].list_poly[0]
-    x_init = pick_point_in_polytope(init_poly)
-    s0_part_ = find_controller.find_discrete_state(
-        x_init, disc_dynamics.ppp)
-    assert s0_part == s0_part_, (s0_part, s0_part_)
-    return d_init, x_init
+# # Set up parameters for get_input()
+# disc_dynamics.disc_params['conservative'] = True
+# disc_dynamics.disc_params['closed_loop'] = False
 
 
-# for `qinit == '\A \A'`
-d_init, x_init = pick_initial_state(ctrl, disc_dynamics)
-simulate2d(env_inputs, sys_dyn, ctrl, disc_dynamics, T,
-           d_init=d_init, x_init=x_init, qinit=specs.qinit)
+# def pick_initial_state(ctrl, disc_dynamics):
+#     """Construct initial discrete and continuous state
+
+#     for `qinit == '\A \A'`.
+#     """
+#     # pick initial discrete state
+#     init_edges = ctrl.edges('Sinit', data=True)
+#     u, v, edge_data = next(iter(init_edges))
+#     assert u == 'Sinit', u
+#     d_init = edge_data
+#     # pick initial continuous state
+#     s0_part = edge_data['loc']
+#     init_poly = disc_dynamics.ppp.regions[s0_part].list_poly[0]
+#     x_init = pick_point_in_polytope(init_poly)
+#     s0_part_ = find_controller.find_discrete_state(
+#         x_init, disc_dynamics.ppp)
+#     assert s0_part == s0_part_, (s0_part, s0_part_)
+#     return d_init, x_init
+
+
+# # for `qinit == '\A \A'`
+# d_init, x_init = pick_initial_state(ctrl, disc_dynamics)
+# simulate2d(env_inputs, sys_dyn, ctrl, disc_dynamics, T,
+#            d_init=d_init, x_init=x_init, qinit=specs.qinit)
