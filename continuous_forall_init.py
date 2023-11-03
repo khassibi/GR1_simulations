@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# https://github.com/tulip-control/tulip-control/blob/b983684c92cdd71bbed8c2765a7766b4868ce54f/examples/continuous_forall_init.py#L66
 """Simulation example with continuous dynamics."""
 from __future__ import division
 from __future__ import print_function
