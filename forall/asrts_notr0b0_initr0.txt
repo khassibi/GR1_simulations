@@ -1,0 +1,85 @@
+ENVIRONMENT VARIABLES:
+	b	(0, 1)
+
+SYSTEM VARIABLES:
+	r	(0, 1)
+
+FORMULA:
+ASSUMPTION:
+    SAFETY
+	  [](!(r=0 & b = 0))
+GUARANTEE:
+    INITIAL
+	  (r=0)
+
+------
+rb_moore_plus_one_EA
+------
+rb_moore_plus_one_AE
+------
+rb_moore_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/labeled_graphs.py", line 1133, in remove_deadends
+    assert n == 0 or m > 0, 'removed all {n} nodes!'.format(n=n)
+AssertionError: removed all 2 nodes!
+
+------
+rb_mealy_plus_one_EA
+------
+rb_mealy_plus_one_AE
+------
+rb_mealy_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/labeled_graphs.py", line 1133, in remove_deadends
+    assert n == 0 or m > 0, 'removed all {n} nodes!'.format(n=n)
+AssertionError: removed all 2 nodes!
+
+------
+rb_moore_EA
+------
+rb_moore_AE
+------
+rb_moore_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/labeled_graphs.py", line 1133, in remove_deadends
+    assert n == 0 or m > 0, 'removed all {n} nodes!'.format(n=n)
+AssertionError: removed all 2 nodes!
+
+------
+rb_mealy_EA
+------
+rb_mealy_AE
+------
+rb_mealy_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/labeled_graphs.py", line 1133, in remove_deadends
+    assert n == 0 or m > 0, 'removed all {n} nodes!'.format(n=n)
+AssertionError: removed all 2 nodes!

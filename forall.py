@@ -6,6 +6,8 @@ from tulip import dumpsmach
 import pickle
 import simulations
 import traceback
+from tulip.interfaces import omega as omega_int
+from omega.games import gr1
 
 logging.basicConfig(level=logging.WARNING)
 
@@ -16,20 +18,14 @@ class ForAll(simulations.Simulation):
         env_vars['b'] = (0,1)
         sys_vars['r'] = (0,1)
 
-        env_init = {}
+        env_init = {'b=1'}
         sys_init = {}
 
-        env_safe = {
-                    "b=0 || b = 1"
-                }
+        env_safe = {'b=0'}
+        sys_safe = {"r = 0"}
 
-
-        sys_safe = {
-                        "r=0 || r = 1"
-                    }
-
-        env_prog = {"b=0 || b = 1"}
-        sys_prog = {"r=0 || r = 1"}
+        env_prog = {'b=0'}
+        sys_prog = {"r=0"}
 
         # Create a GR(1) specification
         specs = spec.GRSpec(env_vars, sys_vars, env_init, sys_init, env_safe, sys_safe, env_prog, sys_prog)
@@ -54,14 +50,36 @@ class ForAll(simulations.Simulation):
 
         self.specs = specs
 
+        aut = omega_int._grspec_to_automaton(specs)
+        winning_set, _, __ = gr1.solve_streett_game(aut)
+        check_bdd = aut.let({'r':1, 'b':0}, winning_set)
+        print(check_bdd == aut.true)
+        # 'r':0, 'b':0 in winning set
+        # 'r':0, 'b':1 in winning set
+        # 'r':1, 'b':1 is NOT in winning set
+        # 'r':1, 'b':0 is NOT in winning set
+        # write a short description of what we learned today: figuring out plus_one and qinit
+        # plus one: thing has to be true one time step later. never set plus_one to be anything but true because then you'll lose causality
+        # qinit: AN INTERESTING CASE: go through these cases for b0r0 on the whiteboard
+        # the sys_init = {} or true comes into play here
+        # hypothesis to why it is not realizable? it removes states that violate safety set, so when it computes the winning set, it gets it wrong
+        # it should not matter because you should not give it an initial condition that the environment instantly violates and what should the system do
+        # let's show examples, where each of the 
+        # \E \A and \A \E: get it back to the initial conditions
+        # see when \E \A and \A \E have the same controllers. they may have different initial conditions
+        # need an example where: the system initial condition depends on what the environment condition does
+        # the initial conditions can be a formula
+        # does env_init only depend on env variables?
+
         return specs.pretty()
 
 
 if __name__ == '__main__':
     path = 'forall/'
     sims = []
-    asrts = open(path + "asrts_bothtrue.txt", "w")
-    f = open(path + "runs_bothtrue.txt", "w")
+    name = 'test_run'
+    asrts = open(path + "asrts_" + name + ".txt", "w")
+    f = open(path + "runs_" + name + ".txt", "w")
     f.write("The simulations of runner blocker that have a realizable controller\n")
     i = 0
     for plus_one in [True, False]:

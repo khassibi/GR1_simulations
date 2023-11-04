@@ -1,0 +1,30 @@
+The simulations of runner blocker that have a realizable controller
+ENVIRONMENT VARIABLES:
+	b	(0, 1)
+
+SYSTEM VARIABLES:
+	r	(0, 2)
+
+FORMULA:
+ASSUMPTION:
+    SAFETY
+	  [](b = 1)
+GUARANTEE:
+    INITIAL
+	  (r = 0)
+    SAFETY
+	  [](!(r=1 & b=1))
+	& [](r = 1 -> X(r=1))
+	& [](r = 2 -> X(r=2))
+	& [](r = 0 -> X((r=1) || (r = 2)))
+    LIVENESS
+	  []<>((r=1) || (r = 2))
+
+------
+rb_moore_EA
+------
+rb_moore_AE
+------
+rb_mealy_EA
+------
+rb_mealy_AE

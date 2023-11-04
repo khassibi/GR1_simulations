@@ -1,0 +1,71 @@
+ENVIRONMENT VARIABLES:
+	b	(0, 1)
+
+SYSTEM VARIABLES:
+	r	(0, 1)
+
+FORMULA:
+ASSUMPTION:
+    INITIAL
+	  (b=1)
+    SAFETY
+	  [](b=0 || b = 1)
+    LIVENESS
+	  []<>(b=0 || b = 1)
+GUARANTEE:
+    SAFETY
+	  [](r=0 || r = 1)
+    LIVENESS
+	  []<>(r=0 || r = 1)
+
+------
+rb_moore_plus_one_EA
+------
+rb_moore_plus_one_AE
+------
+rb_moore_plus_one_AA
+------
+rb_moore_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_EA
+------
+rb_mealy_plus_one_AE
+------
+rb_mealy_plus_one_AA
+------
+rb_mealy_plus_one_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_moore_EA
+------
+rb_moore_AE
+------
+rb_moore_AA
+------
+rb_moore_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError
+
+------
+rb_mealy_EA
+------
+rb_mealy_AE
+------
+rb_mealy_AA
+------
+rb_mealy_EE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 433, in is_realizable
+    assert env_init == aut.true
+AssertionError

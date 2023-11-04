@@ -1,0 +1,133 @@
+ENVIRONMENT VARIABLES:
+	b	(0, 2)
+
+SYSTEM VARIABLES:
+	r	(0, 2)
+
+FORMULA:
+ASSUMPTION:
+    SAFETY
+	  [](b=2 -> X(b=1 || b=2))
+	& [](b=1 -> X(b=1 || b=2))
+	& [](b=0 -> X(b=0 || b=1))
+	& [](!(r=2 & b=1))
+    LIVENESS
+	  []<>(b=2)
+GUARANTEE:
+    INITIAL
+	  (r = 0)
+    SAFETY
+	  [](r = 0 -> X((r=1) || (r = 2)))
+	& [](r = 1 -> X(r=1 || r=2))
+	& [](r = 2 -> X(r=2 || r=1))
+    LIVENESS
+	  []<>((r=1) || (r = 2))
+
+------
+rb_moore_plus_one_EA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_moore_plus_one_AE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_moore_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_plus_one_EE
+------
+rb_mealy_plus_one_EA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_mealy_plus_one_AE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_mealy_plus_one_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_plus_one_EE
+------
+rb_moore_EA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_moore_AE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_moore_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_moore_EE
+------
+rb_mealy_EA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_mealy_AE
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/tulip-1.4.0-py3.8.egg/tulip/transys/mathset.py", line 772, in __setitem__
+    raise ValueError(msg)
+ValueError: key: b, cannot be assigned value: 3
+Admissible values are:
+	{0, 1, 2}
+
+------
+rb_mealy_AA
+Traceback (most recent call last):
+  File "/Users/kimiahassibi/Desktop/Caltech/SURF2023/env/lib/python3.8/site-packages/omega/games/gr1.py", line 425, in is_realizable
+    assert sys_init == aut.true
+AssertionError
+
+------
+rb_mealy_EE
