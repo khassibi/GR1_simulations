@@ -19,9 +19,10 @@ def experiment():
             states.append("c{}{}".format(x, y))
     
     # Variables
+    max_fuel = 14
     env_vars = {'b': (0,4)}
     sys_vars = {'r': states,
-                'fuel': (-1,14),
+                'fuel': (-1,max_fuel),
                 'move': 'boolean'
     }
 
@@ -29,12 +30,13 @@ def experiment():
     # env_init = {'b=2'}
     env_init = {'b=0'}
     sys_init = {'r="c40"',
-                'fuel=14',
+                f'fuel={max_fuel}',
                 '!move'
     }
 
     # Safety
     # Blocker can self-loop (in pat_car_cop2)
+    # Note: When the blocker can self-loop, if the runner loses fuel when idle, the game seems unrealizable
     # env_safe = {'(b=0) -> X((b=0) | (b=1))', 
     #             '(b=4) -> X((b=3) | (b=4))'}
     # for i in range(1,4):
@@ -65,37 +67,14 @@ def experiment():
     }
 
     sys_safe |= {
-                # 'X(r="c42") -> X(fuel = 8)', 
-                'X(r="c42") -> X(fuel = 14)',
-                #  '((r="c42") & move) -> X(fuel = (fuel - 1))',
+                f'X(r="c42") -> X(fuel = {max_fuel})',
                 'X(fuel > -1)',
                 # Decreasing fuel when moving
                 '((X move) && !X(r="c42")) -> (X(fuel) = fuel-2)',
-                #  '(fuel=1) -> X(!move & fuel=1)',
-                #  '(move && fuel<=2 && fuel<8 && !X(r="c42")) -> (X(fuel) = fuel - 1)',
-                #  '(move && fuel=8 && !X(r="c42")) -> X(fuel = 7)'
-                # Fuel staying the same when not moving
-                # '( (!(X move)) -> (X(fuel) = fuel-0.5)'
-                # '( (!(X move) && !X(r="c42")) -> (X(fuel) = fuel-1)'
-                # '(!(X move) && !X(r="c42")) -> (X(fuel) = fuel-1)'
+                # Fuel decreasing when not moving
                 '(!(X move) && !X(r="c42") && !(r="c04")) -> (X(fuel) = fuel-1)',
+                # No more losing fuel when at the goal
                 '(!(X move) && (r="c04")) -> (X(fuel) = fuel)'
-                # '(!(X move) && (fuel=14)) -> X(fuel = 14)',
-                # '(!(X move) && (fuel=13)) -> X(fuel = 13)',
-                # '(!(X move) && (fuel=12)) -> X(fuel = 12)',
-                # '(!(X move) && (fuel=11)) -> X(fuel = 11)',
-                # '(!(X move) && (fuel=10)) -> X(fuel = 10)',
-                # '(!(X move) && (fuel=9)) -> X(fuel = 9)',
-                # '(!(X move) && (fuel=8)) -> X(fuel = 8)',
-                # '(!(X move) && (fuel=7)) -> X(fuel = 7)',
-                # '(!(X move) && (fuel=6)) -> X(fuel = 6)',
-                # '(!(X move) && (fuel=5)) -> X(fuel = 5)',
-                # '(!(X move) && (fuel=4)) -> X(fuel = 4)',
-                # '(!(X move) && (fuel=3)) -> X(fuel = 3)',
-                # '(!(X move) && (fuel=2)) -> X(fuel = 2)',
-                # '(!(X move) && (fuel=1)) -> X(fuel = 1)',
-                # '(!(X move) && (fuel=0)) -> X(fuel = 0)',
-                # '(!(X move) && (fuel=-1)) -> X(fuel = -1)'
         }
     for i in range(0,5):
         sys_safe |= {'!((r="c1{0}") & (b={0}))'.format(i)}#,
