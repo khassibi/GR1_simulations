@@ -2,6 +2,8 @@ import numpy as np
 import matplotlib.animation
 import matplotlib.pyplot as plt
 
+from matplotlib.patches import Rectangle
+
 
 def _plot_grid(ax, xmin, xmax, ymin, ymax, xint, yint, labels):
     grid_width = 1
@@ -114,6 +116,16 @@ def _plot_grid_car(ax, xmin, xmax, ymin, ymax, labels):
     ax.set_xlim((xmin, xmax))
     ax.set_ylim((ymin, ymax))
 
+    # Outlining the blocker's path
+    bpath = Rectangle((xmin+1, ymin), 1, ymax-ymin, edgecolor='none', facecolor='purple', alpha=0.3)
+    ax.add_patch(bpath)
+
+    goal = Rectangle((xmin, ymax-1), 1, 1, edgecolor='none', facecolor='cyan', alpha=0.3)
+    ax.add_patch(goal)
+
+    refuel_zone = Rectangle((xmax-1, 2), 1, 1, edgecolor='none', facecolor='orange', alpha=0.3)
+    ax.add_patch(refuel_zone)
+
     for x in range(xmin, xmax + 1):
         ax.plot([x, x], [ymin, ymax], "k-", linewidth=grid_width)
     for y in range(ymin, ymax + 1):
@@ -138,7 +150,7 @@ def animate_pat_car(fuel, paths, title, max_fuel):
     ymax = 5
     # The location of the fuel markers
     xint = 6
-    yint = 1
+    yint = 0
 
     # The name of the cell and the coordinate of its center
     labels = {}
@@ -175,7 +187,7 @@ def animate_pat_car(fuel, paths, title, max_fuel):
     path_lines = []
     fuel_markers = []
     for i in range(max_fuel):
-        fuel_markers.append(ax.plot(xint, yint + i*0.4, "bs", markersize=20.0, zorder=3)[0])
+        fuel_markers.append(ax.plot(xint, yint + i*0.5, "bs", markersize=20.0, zorder=3)[0])
 
     shapes = ['o', 'D']
     for n, path in enumerate(paths):
