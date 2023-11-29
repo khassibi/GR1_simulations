@@ -131,10 +131,12 @@ def animate_pat_car(fuel, paths, title, max_fuel):
     fig, ax = plt.subplots()
     fig.suptitle(title)
 
+    # Setting the boarders of the grid
     xmin = 0
     xmax = 5
     ymin = 0
     ymax = 5
+    # The location of the fuel markers
     xint = 6
     yint = 1
 
