@@ -10,7 +10,7 @@ from tulip import dumpsmach
 import pickle
 
 def experiment():
-    path = 'idling_decrease/'
+    path = 'patrolling_car/'
 
     # Define the states of the system
     states = []
@@ -70,9 +70,9 @@ def experiment():
                 f'X(r="c42") -> X(fuel = {max_fuel})',
                 'X(fuel > -1)',
                 # Decreasing fuel when moving
-                '((X move) && !X(r="c42")) -> (X(fuel) = fuel-2)',
+                '((X move) && !X(r="c42")) -> (X(fuel) = (fuel-2))',
                 # Fuel decreasing when not moving
-                '(!(X move) && !X(r="c42") && !(r="c04")) -> (X(fuel) = fuel-1)',
+                '(!(X move) && !X(r="c42") && !(r="c04")) -> (X(fuel) = (fuel-1))',
                 # No more losing fuel when at the goal
                 '(!(X move) && (r="c04")) -> (X(fuel) = fuel)'
         }
@@ -127,18 +127,6 @@ def experiment():
     print('did pd0')
     pd0.write_pdf(path + 'game.pdf')
     print('wrote pd0')
-    
-    # # Making a graph of the asynchronous GR(1) game without deadends.
-    # g1 = gb.game_graph(aut, env='env', sys='sys', remove_deadends=True, qinit=aut.qinit)
-    # h1 = gb._game_format_nx(g1, attributes)
-    # pd1 = nx.drawing.nx_pydot.to_pydot(h1)
-    # pd1.write_pdf(path + 'game_no_deadends.pdf')
-
-    # # Making a graph pf the state transitions of the environment and system
-    # g2 = gb.state_graph(aut, env='env', sys='sys', qinit=aut.qinit)
-    # h2, _ = gb._state_format_nx(g2, attributes)
-    # pd2 = nx.drawing.nx_pydot.to_pydot(h2)
-    # pd2.write_pdf(path + 'states.pdf')
 
 if __name__ == '__main__':
     experiment()
