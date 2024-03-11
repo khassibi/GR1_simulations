@@ -72,7 +72,8 @@ class LeftTurnPedestrianTest(Test):
         # Running the test
         counter = 0
         visited = [curr_num]
-        while env_state['a9'] == False and counter < max_runs:
+        while counter < max_runs:
+        # while env_state['a9'] == False and counter < max_runs:
             sys_state = G.nodes[curr_num]
             vh = sys_state['vh']
             p = sys_state['p']
@@ -131,7 +132,8 @@ class LeftTurnPedestrianTest(Test):
 
         # Running the test
         counter = 0
-        while env_state['a9'] == False and counter < max_runs:
+        while counter < max_runs:
+        # while env_state['a9'] == False and counter < max_runs:
             sys_state = G.nodes[curr_num]
             vh = sys_state['vh']
             p = sys_state['p']
