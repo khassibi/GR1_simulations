@@ -169,11 +169,12 @@ def memoryless_robustness_minimization(g, env_robustness):
             max_rob = -1
             for env_suc in list(g.successors(sys_suc)):
                 max_rob = max(max_rob, env_robustness[env_suc])
-        if max_rob < min_rob:
-            min_rob = max_rob
-            actions = [sys_suc]
-        elif max_rob == min_rob:
-            actions.append(sys_suc)
+            # I tabbed the below one to the right
+            if max_rob < min_rob:
+                min_rob = max_rob
+                actions = [sys_suc]
+            elif max_rob == min_rob:
+                actions.append(sys_suc)
         transitions[env_node] = actions
     
     return transitions

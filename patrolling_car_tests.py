@@ -134,8 +134,15 @@ def experiment():
                         'c44']}
     test = PatrollingCarTest(path, conversion)
     G, ctrl = test.organize_graph_and_controller()
-    test.rand_tests(G, ctrl)
-    test.no_repeat_rand_tests(G, ctrl)
+
+    env_prog_dict = {'b': 0}
+    print('before')
+    env_prog_nodes = test.get_env_prog_nodes(G, env_prog_dict)
+    print('middle')
+    prog_cycles = test.get_prog_cycles(G, env_prog_dict, env_prog_nodes, '/Users/kimiahassibi/Desktop/Caltech/SURF2023/GR1_simulations/patrolling_car/cycles')
+
+    # test.rand_tests(G, ctrl)
+    # test.no_repeat_rand_tests(G, ctrl)
 
 if __name__ == "__main__":
     experiment()

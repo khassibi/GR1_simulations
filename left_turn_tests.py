@@ -149,8 +149,17 @@ def experiment():
                   'loc': ['c4', 'c7', 'c8', 'c9']}
     test = LeftTurnTest(path, conversion)
     G, ctrl = test.organize_graph_and_controller()
-    test.rand_tests(G, ctrl)
-    test.no_repeat_rand_tests(G, ctrl)
+
+    # env_prog_dict = {'vh': 6, 'light': 0}
+    env_prog_dict = {'vh': 6, 'light': 'g1'}
+    # env_prog_nodes = test.get_env_prog_nodes(G, env_prog_dict)
+    # prog_cycles = test.get_prog_cycles(G, env_prog_dict, env_prog_nodes)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
+
+    # test.rand_tests(G, ctrl)
+    # test.no_repeat_rand_tests(G, ctrl)
 
 if __name__ == "__main__":
     experiment()

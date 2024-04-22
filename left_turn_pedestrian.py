@@ -82,6 +82,7 @@ def experiment():
     env_prog = {'vh = 6',
                 'light = "g1"',
                 'p = 6'}
+    # env_prog_dict = {'vh': 6, 'p': 6, 'light': 0}
     sys_prog = {'a9'}
 
     specs = settings.set_specs(env_vars, sys_vars, env_init, sys_init,
