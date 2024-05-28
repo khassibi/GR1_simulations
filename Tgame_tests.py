@@ -30,12 +30,19 @@ class TgameTest(Test):
         # Animate the results
         anim = animate.animate_Tgame((sys_path, env_path), title)
         anim.save(path + title + '.gif')
+    
+    def animate_R(self, R, trajectory, title):
+        # Animate the results
+        ani = animate.animate_Rs(R, trajectory, title)
+        ani.save(path + title + '.gif')
+        # with open(path + title, 'w') as f:
+        #     print(ani.to_jshtml(), file=f)
 
-    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs):
+    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs, length_bound=None):
 
         env_prog_nodes = self.get_env_prog_nodes(G, env_prog_dict)
 
-        prog_cycles = self.get_prog_cycles(G, env_prog_dict, env_prog_nodes)
+        prog_cycles = self.get_prog_cycles(G, env_prog_dict, env_prog_nodes, length_bound=length_bound)
 
         # getting the nodes in the cycles that satisfy the env progress conditions
         nodes_satisfying_prog = set()
@@ -43,6 +50,7 @@ class TgameTest(Test):
             nodes_satisfying_prog |= set(lst)
 
         R = self.calculate_winning_sets(G, nodes_satisfying_prog)
+        R_ret = R
         i = len(R) - 1
         print('i:', i)
         T = [0] * len(R)
@@ -101,7 +109,7 @@ class TgameTest(Test):
         if iter >= 100:
             print("len(b_signal)", len(b_signal))
             signals = {'b': b_signal}
-            return signals, trajectory 
+            return signals, trajectory, R_ret 
 
         # find the cycle we are in
         cycle = []
@@ -156,7 +164,7 @@ class TgameTest(Test):
         
         signals = {'b': b_signal}
         
-        return signals, trajectory  
+        return signals, trajectory, R_ret
 
 def experiment():
     conversion = {'loc': ['c0', 'c1', 'c2', 'c3']}
@@ -165,8 +173,9 @@ def experiment():
     # test.rand_tests(G, ctrl)
     # test.no_repeat_rand_tests(G, ctrl)
     env_prog_dict = {'b': 4}
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
 

@@ -91,10 +91,10 @@ class Test:
     def rand_test_with_metric(self, G, init_node, test, metric, max_runs):
         pass
 
-    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs):
+    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs, length_bound=None):
         pass
 
-    def run_prog_tests(self, G, ctrl, env_prog_dict, penalty, max_runs):
+    def run_prog_tests(self, G, ctrl, env_prog_dict, penalty, max_runs, length_bound=None):
         # Running the test that greedily picks the next state with the most unsafe 
         # nodes
         # title = "Memoryless Most Red"
@@ -111,13 +111,15 @@ class Test:
 
         title = "Progress Min Robustness, Penalty=" + str(penalty)
         min_robustness_env_metric = hard_tests.find_min_robustness(G)
-        signals, trajectory = self.test_with_metric_and_prog(G, 0, min_robustness_env_metric, env_prog_dict, penalty, max_runs)
+        signals, trajectory, R = self.test_with_metric_and_prog(G, 0, min_robustness_env_metric, env_prog_dict, penalty, max_runs, length_bound=length_bound)
         self.animate_test(ctrl, signals, title)
+        self.animate_R(R, trajectory, "R's Min Robustness, Penalty=" + str(penalty))
 
         title = "Progress Average Robustness, Penalty=" + str(penalty)
         avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
-        signals, trajectory = self.test_with_metric_and_prog(G, 0, avg_robustness_env_metric, env_prog_dict, penalty, max_runs)
+        signals, trajectory, R = self.test_with_metric_and_prog(G, 0, avg_robustness_env_metric, env_prog_dict, penalty, max_runs, length_bound=length_bound)
         self.animate_test(ctrl, signals, title)
+        self.animate_R(R, trajectory, "R's Average Robustness, Penalty=" + str(penalty))
 
         # title = "Memoryless Min Robustness - Averaging"
         # # min_robustness_env_metric = hard_tests.find_min_robustness(G)
@@ -130,6 +132,9 @@ class Test:
         # self.animate_test(ctrl, signals, title)
 
     def animate_test(self, ctrl, signals, title):
+        pass
+
+    def animate_R(self, R, trajectory, title):
         pass
 
     def removing_env_unsafe_nodes(self, G):
@@ -177,12 +182,12 @@ class Test:
         
         return env_prog_nodes
     
-    def get_prog_cycles(self, G, env_prog_dict, env_prog_nodes, path=None):
+    def get_prog_cycles(self, G, env_prog_dict, env_prog_nodes, length_bound=None, path=None):
         
         # find all the simple cycles in G
-        cycles = list(nx.simple_cycles(G)) # TAKES TOO LONG TO RUN
-        if path:
-            pickle.dump(cycles, path)
+        cycles = list(nx.simple_cycles(G, length_bound=length_bound)) # TAKES TOO LONG TO RUN
+        # if path:
+        #     pickle.dump(cycles, path)
         print('cycles found')
 
         print("cycles:", cycles)
@@ -272,15 +277,19 @@ class Test:
     
     def find_R_i(self, curr_node, R):
         i = 0
-        while True:
+        assert curr_node is not None
+        while i < len(R):
             if curr_node not in R[i]:
                 i += 1
             else:
                 break
+        print("curr_node: ", curr_node, ", i:", i, ", len(R): ", len(R))
+        assert curr_node in R[i] #, f"curr_node: {curr_node}, i: {i}, len(R): {len(R)}"
         return i
     
     def find_time_in_Ri(self, T, i):
         time_in_Ri = 0
+        # Ranges from 0 to i, inclusive
         for j in range(i+1):
             time_in_Ri += T[j]
         return time_in_Ri
@@ -297,14 +306,18 @@ class Test:
             # I have the maximimum robustness that can result from environment 
             # doing action sys_suc
             maximized_robustness[sys_suc] = max_rob
+            # is sys_suc in the set of nodes??
             if self.find_R_i(sys_suc, R) < i:
                 closer_to_R0[sys_suc] = 0
             else:
                 closer_to_R0[sys_suc] = 1
         
+        # i that the system brought us to
         i = self.find_R_i(env_node, R)
+        T[i] += 1 # added
 
         time_in_Ri = self.find_time_in_Ri(T, i)
+        print('i: ', i, ", time_in_Ri: ", time_in_Ri)
 
         metric = {}
 
@@ -323,10 +336,14 @@ class Test:
         return node
 
     def calculate_winning_sets(self, G, R0, possible_actions=None):
+        print("R0:", R0)
+        R0_env = {node for node in R0 if G.nodes[node]['shape'] == 'box'}
+        print("R0_env:", R0_env)
+
         # calculate the "levels" from the env prog cycle outwards
         R = {}
         i = 0
-        R[i] = R0
+        R[i] = R0_env
         while True:
             new_nodes = set()
             for node in R[i]:

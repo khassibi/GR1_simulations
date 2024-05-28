@@ -19,7 +19,10 @@ def experiment():
             states.append("c{}{}".format(x, y))
     
     # Variables
-    max_fuel = 14
+    # max_fuel = 14 # worked
+    max_fuel = 12 # worked
+    # max_fuel = 10 # did not work
+    # max_fuel = 11 # did not work
     env_vars = {'b': (0,4)}
     sys_vars = {'r': states,
                 'fuel': (-1,max_fuel),

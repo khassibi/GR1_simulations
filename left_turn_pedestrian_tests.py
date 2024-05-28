@@ -43,6 +43,11 @@ class LeftTurnPedestrianTest(Test):
                                             title)
         anim.save(path + title + '.gif')
 
+    def animate_R(self, R, trajectory, title):
+        # Animate the results
+        anim = animate.animate_Rs(R, trajectory, title)
+        anim.save(path + title + '.gif')
+
     def no_repeat_rand_test_with_metric(self, G, init_node, test, metric, max_runs):
         curr_num = init_node
         trajectory = [curr_num]
@@ -155,7 +160,7 @@ class LeftTurnPedestrianTest(Test):
         
         signals = {'light': light_signal, 'vh': vh_signal, 'p': p_signal}
         
-        return signals, trajectory 
+        return signals, trajectory
     
     # def find_R_i(self, curr_node, R):
     #     i = 0
@@ -328,11 +333,11 @@ class LeftTurnPedestrianTest(Test):
         
     #     return largest_cycles
     
-    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs):
+    def test_with_metric_and_prog(self, G, init_node, robustness, env_prog_dict, penalty, max_runs, length_bound=None):
 
         env_prog_nodes = self.get_env_prog_nodes(G, env_prog_dict)
 
-        prog_cycles = self.get_prog_cycles(G, env_prog_dict, env_prog_nodes)
+        prog_cycles = self.get_prog_cycles(G, env_prog_dict, env_prog_nodes, length_bound=length_bound)
 
         # getting the nodes in the cycles that satisfy the env progress conditions
         nodes_satisfying_prog = set()
@@ -340,6 +345,7 @@ class LeftTurnPedestrianTest(Test):
             nodes_satisfying_prog |= set(lst)
 
         R = self.calculate_winning_sets(G, nodes_satisfying_prog)
+        R_ret = R
 
         i = len(R) - 1
         print('i:', i)
@@ -471,7 +477,7 @@ class LeftTurnPedestrianTest(Test):
         
         signals = {'light': light_signal, 'vh': vh_signal, 'p': p_signal}
         
-        return signals, trajectory  
+        return signals, trajectory, R_ret
 
 def experiment():
     conversion = {'light': ['g1', 'g2', 'g3', 'y1', 'y2', 'r'], 
@@ -481,8 +487,9 @@ def experiment():
     # test.rand_tests(G, ctrl)
     # test.no_repeat_rand_tests(G, ctrl)
     env_prog_dict = {'vh': 6, 'p': 6, 'light': 'g1'}
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
+    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
     test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
 

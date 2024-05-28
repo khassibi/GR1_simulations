@@ -3,7 +3,11 @@ import matplotlib.animation
 import matplotlib.pyplot as plt
 
 from matplotlib.patches import Rectangle
+from matplotlib.patches import Circle
 
+from matplotlib.animation import FuncAnimation
+
+from IPython.display import HTML
 
 def _plot_grid(ax, xmin, xmax, ymin, ymax, xint, yint, labels):
     grid_width = 1
@@ -252,8 +256,14 @@ def animate_Tgame(paths, title):
     labels = {}
     for x in range(xmin, xmax, 1):
         labels['c' + str(x)] = (x + 0.5, yint + 0.5)
+    text_counter = 0
     for y in range(ymin, ymax, 1):
-        labels['b=' + str(y)] = (xint + 0.5, y + 0.5)
+        # labels['b=' + str(y)] = (xint + 0.5, y + 0.5)
+        text_counter += 1
+        if text_counter != 3:
+            labels['c' + str(y + 4)] = (x + 0.5, ymax - yint + 0.5)
+        else:
+            labels[''] = (x + 0.5, ymax - yint + 0.5)
 
     def init():
         _plot_grid_T(ax, xmin, xmax, ymin, ymax, xint, yint, labels)
@@ -288,3 +298,65 @@ def animate_Tgame(paths, title):
     )
 
     return anim
+
+def animate_Rs(R, trajectory, title):
+    # Setup plot
+    fig, ax = plt.subplots()
+    fig.suptitle(title)
+    max_rad = len(R) + 1
+    ax.set_xlim(-max_rad, max_rad)  # Set wide enough limits to enclose all circles
+    ax.set_ylim(-max_rad, max_rad)
+    ax.set_aspect('equal', adjustable='datalim')  # Keep the aspect ratio of the plot square
+    # Create circles and add them to the axes
+    # circles = [Circle((0, 0), radius=i+1, fill=False, color='blue', alpha=0.5, edgecolor='blue', linewidth=1.5) for i in sorted(R, reverse=False)]
+    circles = [Circle((0, 0), radius=i+1, fill=False, edgecolor='black', linewidth=1.5) for i in R]
+    for circle in circles:
+        ax.add_patch(circle)
+    
+    # Animation update function
+    def update(frame):
+        # node = trajectory[frame % len(trajectory)]
+        node = trajectory[frame]
+        
+        # Reset all circles to non-highlighted state
+        for circle in circles:
+            circle.set_edgecolor('black')
+            circle.set_linewidth(1.5)
+        
+        # the find_R_i function in test_builder
+        i = 0
+        while i < len(R):
+            if node not in R[i]:
+                i += 1
+            else:
+                break
+        
+        # Highlight the relevant circle(s)
+        # for i, circle in enumerate(circles):
+        #     if node in R[len(R) - 1 - i]:  # Adjust index for reverse order of circles
+        #         # circle.set_edgecolor('red')
+        #         circle.set_facecolor('red')  # Change fill color
+        #         circle.set_alpha(0.8)  # Less transparency for highlight
+        #         circle.set_linewidth(3.0)
+        circle = circles[i]
+        circle.set_edgecolor('red')
+        circle.set_linewidth(3.0)
+        
+        return circles
+    
+    # Initialize function to reset the view during the first frame
+    def init():
+        for circle in circles:
+            circle.set_edgecolor('blue')
+            circle.set_linewidth(1.5)
+        return circles
+
+    # Create and display the animation
+    ani = FuncAnimation(fig, update, frames=len(trajectory), init_func=init, blit=False, repeat=True)
+
+    return ani
+    # Use HTML to display the animation within the notebook
+    # HTML(ani.to_jshtml())
+    # Save the animation to an HTML file
+    # with open(title, 'w') as f:
+    #     print(ani.to_jshtml(), file=f)
