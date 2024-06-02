@@ -238,7 +238,6 @@ class Test:
         
         print("prog_satisfying_cycles:", prog_satisfying_cycles)
 
-        # MOVE THIS TO LATER ON!!!!!!!!!!!!!!!!!
         # Remove any cycles with the system leaving
         no_leave_cycles = []
         for cycle in prog_satisfying_cycles:
@@ -260,7 +259,7 @@ class Test:
         print("no_leave_cycles:", no_leave_cycles)
         
         # Take the cycles that encompass the others
-        # Question: is this set even necessary?
+        # QUESTION: is this set even necessary?
         largest_cycles = []
         for cycle in no_leave_cycles:
             is_subset = False
@@ -337,7 +336,7 @@ class Test:
 
     def calculate_winning_sets(self, G, R0, possible_actions=None):
         print("R0:", R0)
-        R0_env = {node for node in R0 if G.nodes[node]['shape'] == 'box'}
+        R0_env = {node for node in R0 if G.nodes[node]['shape'] == 'box'} # nodes from which the system makes an action
         print("R0_env:", R0_env)
 
         # calculate the "levels" from the env prog cycle outwards
@@ -352,9 +351,9 @@ class Test:
                     new_nodes |= (set(G.predecessors(node)) & possible_actions)
                 else:
                     # Add the predecessors of the node to new_nodes
-                    new_nodes |= set(G.predecessors(node))
+                    new_nodes |= set(G.predecessors(node)) # environment actions that lead to R[i]
             # Take the union of the new_nodes & the previous set of nodes
-            R[i+1] = new_nodes | R[i]
+            R[i+1] = new_nodes | R[i] # R[i] (sys nodes) & env nodes that can lead to R[i] (env nodes)
 
             new_nodes = set()
             # Looking at next set
@@ -368,7 +367,7 @@ class Test:
                         if trans not in R[i+1]:
                             all_transitions_to_Ri1 = False
                             break
-                    if all_transitions_to_Ri1:
+                    if all_transitions_to_Ri1: # but wait we don't need this for the env nodes
                         new_nodes.add(prev)
             R[i+2] = new_nodes | R[i+1]
 
