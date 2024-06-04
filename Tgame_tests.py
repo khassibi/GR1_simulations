@@ -43,6 +43,8 @@ class TgameTest(Test):
         env_prog_nodes = self.get_env_prog_nodes(G, env_prog_dict)
 
         prog_cycles = self.get_prog_cycles(G, env_prog_dict, env_prog_nodes, length_bound=length_bound)
+        with open(path + 'prog_cycles', "wb") as file:
+            pickle.dump(prog_cycles, file)
 
         # getting the nodes in the cycles that satisfy the env progress conditions
         nodes_satisfying_prog = set()

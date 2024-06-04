@@ -199,13 +199,43 @@ class Test:
         
         print("old_cycles:", old_cycles)
 
+        # removing subsets
+        # new_cycles = old_cycles.copy()
+        # for cycle1 in old_cycles:
+        #     for cycle2 in old_cycles:
+        #         if cycle1.issubset(cycle2) and cycle1 != cycle2:
+        #             new_cycles.remove(cycle1)
+
         # Combining simple cycles together and adding those to set of cycles
         new_cycles = old_cycles.copy()
         while True:
             for cycle1 in old_cycles:
                 for cycle2 in old_cycles:
-                    if cycle1 is not cycle2 and not cycle1.isdisjoint(cycle2):
-                        new_cycles.add(frozenset(cycle1.union(cycle2)))
+                    # if not (cycle1.issubset(cycle2) or cycle2.issubset(cycle1)) and not cycle1.isdisjoint(cycle2):
+                    if cycle1 != cycle2:
+                        # get the intersection of the 2 nodes
+                        # get the environment nodes
+                        # loop over these nodes
+                        # loop over succesors of environment nodes
+                        # if one successor in cycle 1
+                        # and another successor in cycle 2
+                        # then add the union of the 2 cycles together
+                        cyc_intersection = cycle1.intersection(cycle2)
+                        env_intersection = [node for node in cyc_intersection if G.nodes[node]['shape'] == 'oval']
+                        for env_node in env_intersection:
+                            to_cycle1 = False
+                            to_cycle2 = False
+                            for succ in G.successors(env_node):
+                                if succ in cycle1:
+                                    to_cycle1 = True
+                                elif succ in cycle2:
+                                    to_cycle2 = True
+                                if to_cycle1 and to_cycle2:
+                                    break
+                            if to_cycle1 and to_cycle2:
+                                    new_cycles.add(frozenset(cycle1.union(cycle2)))
+                                    break
+            print(len(old_cycles), len(new_cycles))
             if new_cycles == old_cycles:
                 break
             else:
@@ -215,12 +245,12 @@ class Test:
         print(cycles == old_cycles)
         print("cycles:", cycles)
 
-        for cycle in cycles:
-            prnt_str = ''
-            for node in cycle:
-                prnt_str += str(G.nodes[node])
-            print(prnt_str)
-            print()
+        # for cycle in cycles:
+        #     prnt_str = ''
+        #     for node in cycle:
+        #         prnt_str += str(G.nodes[node])
+        #     print(prnt_str)
+        #     print()
 
         # Filter cycles that contain nodes that satisfy each type of progress condition
         prog_satisfying_cycles = []
@@ -282,8 +312,9 @@ class Test:
                 i += 1
             else:
                 break
-        print("curr_node: ", curr_node, ", i:", i, ", len(R): ", len(R))
-        assert curr_node in R[i] #, f"curr_node: {curr_node}, i: {i}, len(R): {len(R)}"
+        print("curr_node: ", curr_node, ", i:", i, ", len(R): ", len(R), 'R:', R)
+        error_str = f"curr_node: {curr_node}, i: {i}, len(R): {len(R)}, R:{R}"
+        assert curr_node in R[i], error_str
         return i
     
     def find_time_in_Ri(self, T, i):
@@ -306,10 +337,7 @@ class Test:
             # doing action sys_suc
             maximized_robustness[sys_suc] = max_rob
             # is sys_suc in the set of nodes??
-            if self.find_R_i(sys_suc, R) < i:
-                closer_to_R0[sys_suc] = 0
-            else:
-                closer_to_R0[sys_suc] = 1
+            closer_to_R0[sys_suc] = int(self.find_R_i(sys_suc, R) >= i)
         
         # i that the system brought us to
         i = self.find_R_i(env_node, R)
@@ -333,49 +361,80 @@ class Test:
         node = random.choice(min_keys)
 
         return node
+    
+    def union_every_other(self, dictionary, i):
+        big_lst = set()
+        for idx in range(i % 2, i + 1, 2):
+            big_lst |= set(dictionary[idx])
+        return big_lst
+    
+    def union_upto(self, dictionary, i):
+        big_lst = set()
+        for idx in range(i+1):
+            big_lst |= set(dictionary[idx])
+        return big_lst
 
     def calculate_winning_sets(self, G, R0, possible_actions=None):
         print("R0:", R0)
+        if possible_actions != None:
+            R0 = (set(R0) & possible_actions)
         R0_env = {node for node in R0 if G.nodes[node]['shape'] == 'box'} # nodes from which the system makes an action
         print("R0_env:", R0_env)
 
         # calculate the "levels" from the env prog cycle outwards
         R = {}
+        S = {}
         i = 0
         R[i] = R0_env
+        S[i] = R0_env
         while True:
-            new_nodes = set()
-            for node in R[i]:
+            env_nodes = set()
+            # for node in R[i]:
+            for node in S[i]:
+                if G.nodes[node]['shape'] != 'box':
+                    continue
                 if possible_actions != None:
                     # Add the predecessors of the node (that are part of possible_actions) to new_nodes
-                    new_nodes |= (set(G.predecessors(node)) & possible_actions)
+                    env_nodes |= (set(G.predecessors(node)) & possible_actions)
                 else:
                     # Add the predecessors of the node to new_nodes
-                    new_nodes |= set(G.predecessors(node)) # environment actions that lead to R[i]
+                    env_nodes |= set(G.predecessors(node)) # environment nodes that lead to R[i]
             # Take the union of the new_nodes & the previous set of nodes
-            R[i+1] = new_nodes | R[i] # R[i] (sys nodes) & env nodes that can lead to R[i] (env nodes)
+            # R[i+1] = env_nodes | R[i] # R[i] (sys nodes) & env nodes that can lead to R[i] (env nodes)
+            R[i+1] = env_nodes
+            S[i+1] = env_nodes | S[i]
 
-            new_nodes = set()
+            sys_nodes = set()
             # Looking at next set
-            for node in R[i+1]:
+            # for node in R[i+1]:
+            # for env_node in env_nodes:
+            for env_node in S[i+1]:
                 # looking at predecessors to R[i+1]
-                for prev in set(G.predecessors(node)):
+                if G.nodes[node]['shape'] == 'box':
+                    continue
+                for sys_node in set(G.predecessors(env_node)):
                     # seeing if all the transitions from these predecessors goes into R[i+1]
                     all_transitions_to_Ri1 = True
                     # looking at all actions of predecessors to this set
-                    for trans in set(G.successors(prev)):
-                        if trans not in R[i+1]:
+                    for trans in set(G.successors(sys_node)):
+                        # if trans not in self.union_upto(R, i+1): # QUESTION: should it be something other than R[i]??
+                        if trans not in S[i+1]:
                             all_transitions_to_Ri1 = False
                             break
                     if all_transitions_to_Ri1: # but wait we don't need this for the env nodes
-                        new_nodes.add(prev)
-            R[i+2] = new_nodes | R[i+1]
+                        sys_nodes.add(sys_node)
+            S[i+2] = sys_nodes | S[i+1]
+            R[i+2] = sys_nodes
 
-            if R[i+2] == R[i]:
+            if R[i+2] == R[i] and S[i+2] == S[i]:
                 R.pop(i+2)
                 R.pop(i+1)
+                S.pop(i+2)
+                S.pop(i+1)
                 break
+            # if 0 in S[i+2]:
+            #     break
             else:
                 i += 2
         
-        return R
+        return S
