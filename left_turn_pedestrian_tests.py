@@ -10,7 +10,14 @@ from IPython.display import HTML
 
 import networkx as nx
 
-from test_builder import *
+# from test_builder import *
+from test_builder_timer import *
+
+import time
+# List to store the elapsed times
+elapsed_times = []
+cut_off_early = []
+max_time_elapsed = 1e6
 
 path = 'left_turn_pedestrian/'
 
@@ -348,7 +355,7 @@ class LeftTurnPedestrianTest(Test):
         R_ret = R
 
         i = len(R) - 1
-        print('i:', i)
+        # print('i:', i)
         # assert init_node in R[i]
 
         T = [0] * len(R)
@@ -373,6 +380,8 @@ class LeftTurnPedestrianTest(Test):
         # test_transitions = test(G, metric)
         
         sys_control = sys_ctrl()
+        # Start timing
+        start_time = time.time()
         env_state = sys_ctrl.move(sys_control, vh, p, light)
         env_state.update({'vh': vh, "p": p, 'light': light, 'shape': 'oval'})
         assert env_state == init_state, (env_state, init_state)
@@ -380,8 +389,8 @@ class LeftTurnPedestrianTest(Test):
         # use the metric to find the best environment action to take
         curr_num = self.find_trans_prog(G, curr_num, R, i, T, penalty, robustness)
         i = self.find_R_i(curr_num, R)
-        print('i:', i, ', curr_num:', curr_num)
-        print('R[i]:', R[i])
+        # print('i:', i, ', curr_num:', curr_num)
+        # print('R[i]:', R[i])
         T[i] += 1
         # curr_num = random.choice(test_transitions[curr_num])
         # curr_num = test_transitions[curr_num][0]
@@ -389,10 +398,10 @@ class LeftTurnPedestrianTest(Test):
         # Running the test
         # while counter < max_runs:
         # while env_state['a9'] == False and counter < max_runs:
-        print('before while loop')
+        # print('before while loop')
         iter = 0
         while i != 0:
-            print('iter:', iter, ', i:', i)
+            # print('iter:', iter, ', i:', i)
             # Update the current state, given the environment's action 
             sys_state = G.nodes[curr_num]
             vh = sys_state['vh']
@@ -426,7 +435,7 @@ class LeftTurnPedestrianTest(Test):
             if curr_num in c:
                 cycle = c
                 break
-        print('cycle:', cycle)
+        # print('cycle:', cycle)
 
         counter = 0
         num_times_satisfying_prog = 0
@@ -472,8 +481,18 @@ class LeftTurnPedestrianTest(Test):
                     i = self.find_R_i(curr_num, R)
                     T[i] += 1
                     counter += 1
-            print("num_times_satisfying_prog:", num_times_satisfying_prog)
+            # print("num_times_satisfying_prog:", num_times_satisfying_prog)
             num_times_satisfying_prog += 1
+        
+        # End timing
+        end_time = time.time()
+
+        # Calculate elapsed time
+        elapsed_time = end_time - start_time
+
+        # Store the elapsed time
+        elapsed_times.append(elapsed_time)
+        cut_off_early.append(True)
         
         signals = {'light': light_signal, 'vh': vh_signal, 'p': p_signal}
         
@@ -487,11 +506,19 @@ def experiment():
     # test.rand_tests(G, ctrl)
     # test.no_repeat_rand_tests(G, ctrl)
     env_prog_dict = {'vh': 6, 'p': 6, 'light': 'g1'}
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
+    penalties = [-1, 0, 0.25, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 100]
+    for idx, penalty in enumerate(penalties):
+        print(idx)
+        test.run_prog_tests(G, ctrl, env_prog_dict, penalty, max_time_elapsed)
+    with open(path + 'elapsed_times', "wb") as file:
+        pickle.dump(elapsed_times, file)
+    with open(path + 'cut_off_early', "wb") as file:
+        pickle.dump(cut_off_early, file)
 
 if __name__ == "__main__":
     experiment()

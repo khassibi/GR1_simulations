@@ -10,14 +10,21 @@ from IPython.display import HTML
 
 import networkx as nx
 
-from test_builder import *
+# from test_builder import *
 # from old_test_builder import *
+from test_builder_timer import *
+
+import time
+# List to store the elapsed times
+elapsed_times = []
+cut_off_early = []
+max_time_elapsed = 1e6
 
 path = 'Tgame/'
 
 class TgameTest(Test):
     def animate_test(self, ctrl, signals, title):
-        print('made it to animate')
+        # print('made it to animate')
         # signals = {'b': b_signal}
         time, states = ctrl.run('Sinit', signals)
 
@@ -56,7 +63,7 @@ class TgameTest(Test):
         R = self.calculate_winning_sets(G, nodes_satisfying_prog)
         R_ret = R
         i = len(R) - 1
-        print('i:', i)
+        # print('i:', i)
         T = [0] * len(R)
 
         curr_num = init_node
@@ -70,6 +77,8 @@ class TgameTest(Test):
         b_signal = [b]
 
         sys_control = sys_ctrl()
+        # Start timing
+        start_time = time.time()
         env_state = sys_ctrl.move(sys_control, b)
         env_state.update({'b': b, 'shape': 'oval'})
         assert env_state == init_state, (env_state, init_state)
@@ -77,15 +86,16 @@ class TgameTest(Test):
         # use the metric to find the best environment action to take
         curr_num = self.find_trans_prog(G, curr_num, R, i, T, penalty, robustness)
         i = self.find_R_i(curr_num, R)
-        print('i:', i, ', curr_num:', curr_num)
-        print('R[i]:', R[i])
+        # print('i:', i, ', curr_num:', curr_num)
+        # print('R[i]:', R[i])
         T[i] += 1
 
         # Running the test
-        print('before while loop')
+        # print('before while loop')
         iter = 0
-        while i != 0 and iter < 100:
-            print('iter:', iter, ', i:', i)
+        max_iters = max_time_elapsed
+        while i != 0 and iter < max_iters:
+            # print('iter:', iter, ', i:', i)
             # Update the current state, given the environment's action 
             sys_state = G.nodes[curr_num]
             b = sys_state['b']
@@ -99,19 +109,31 @@ class TgameTest(Test):
 
             # Get the node corresponding to the system's action
             curr_num = list(G.nodes.values()).index(env_state)
-            print('sys_action:', curr_num)
+            # print('sys_action:', curr_num)
             trajectory.append(curr_num)
 
             # curr_num = random.choice(test_transitions[curr_num])
             # use the metric to find the best environment action to take
             curr_num = self.find_trans_prog(G, curr_num, R, i, T, penalty, robustness)
-            print('env_action:', curr_num)
+            # print('env_action:', curr_num)
             i = self.find_R_i(curr_num, R)
             T[i] += 1
             iter += 1
 
-        if iter >= 100:
-            print("len(b_signal)", len(b_signal))
+        if iter >= max_iters:
+            # print("len(b_signal)", len(b_signal))
+            signals = {'b': b_signal}
+
+            # End timing
+            end_time = time.time()
+
+            # Calculate elapsed time
+            elapsed_time = end_time - start_time
+
+            # Store the elapsed time
+            elapsed_times.append(elapsed_time)
+            cut_off_early.append(True)
+            
             signals = {'b': b_signal}
             return signals, trajectory, R_ret 
 
@@ -121,7 +143,7 @@ class TgameTest(Test):
             if curr_num in c:
                 cycle = c
                 break
-        print('cycle:', cycle)
+        # print('cycle:', cycle)
 
         counter = 0
         num_times_satisfying_prog = 0
@@ -163,8 +185,18 @@ class TgameTest(Test):
                     i = self.find_R_i(curr_num, R)
                     T[i] += 1
                     counter += 1
-            print("num_times_satisfying_prog:", num_times_satisfying_prog)
+            # print("num_times_satisfying_prog:", num_times_satisfying_prog)
             num_times_satisfying_prog += 1
+        
+        # End timing
+        end_time = time.time()
+
+        # Calculate elapsed time
+        elapsed_time = end_time - start_time
+
+        # Store the elapsed time
+        elapsed_times.append(elapsed_time)
+        cut_off_early.append(False)
         
         signals = {'b': b_signal}
         
@@ -177,11 +209,19 @@ def experiment():
     # test.rand_tests(G, ctrl)
     # test.no_repeat_rand_tests(G, ctrl)
     env_prog_dict = {'b': 4}
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
-    test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
+    penalties = [-1, 0, 0.25, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 10, 100]
+    for idx, penalty in enumerate(penalties):
+        print(idx)
+        test.run_prog_tests(G, ctrl, env_prog_dict, penalty, max_time_elapsed)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0.25, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 0.5, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 1, 30)
+    # test.run_prog_tests(G, ctrl, env_prog_dict, 5, 30)
+    with open(path + 'elapsed_times', "wb") as file:
+        pickle.dump(elapsed_times, file)
+    with open(path + 'cut_off_early', "wb") as file:
+        pickle.dump(cut_off_early, file)
 
 if __name__ == "__main__":
     experiment()

@@ -108,18 +108,21 @@ class Test:
         # percent_red_sys_metric = hard_tests.find_percent_red_successors(G)
         # signals, trajectory = self.rand_test_with_metric(G, 0, hard_tests.memoryless_max_metric, percent_red_sys_metric, 30)
         # self.animate_test(ctrl, signals, title)
-
+        '''
         title = "Progress Min Robustness, Penalty=" + str(penalty)
         min_robustness_env_metric = hard_tests.find_min_robustness(G)
         signals, trajectory, R = self.test_with_metric_and_prog(G, 0, min_robustness_env_metric, env_prog_dict, penalty, max_runs, length_bound=length_bound)
         self.animate_test(ctrl, signals, title)
         self.animate_R(R, trajectory, "R's Min Robustness, Penalty=" + str(penalty))
+        '''
 
         title = "Progress Average Robustness, Penalty=" + str(penalty)
         avg_robustness_env_metric = hard_tests.find_avg_robustness(G)
         signals, trajectory, R = self.test_with_metric_and_prog(G, 0, avg_robustness_env_metric, env_prog_dict, penalty, max_runs, length_bound=length_bound)
+        '''
         self.animate_test(ctrl, signals, title)
         self.animate_R(R, trajectory, "R's Average Robustness, Penalty=" + str(penalty))
+        '''
 
         # title = "Memoryless Min Robustness - Averaging"
         # # min_robustness_env_metric = hard_tests.find_min_robustness(G)
@@ -142,7 +145,7 @@ class Test:
 
     def organize_graph_and_controller(self):
         # Load the graph from the saved file
-        print(Path.cwd())
+        # print(Path.cwd())
         with open(self.path + 'graph', "rb") as file:
             G = pickle.load(file)
 
@@ -178,7 +181,7 @@ class Test:
                 if item in G.nodes[node].items():
                     env_prog_nodes[item].append(node)
         
-        print("env_prog_nodes:\n",env_prog_nodes)
+        # print("env_prog_nodes:\n",env_prog_nodes)
         
         return env_prog_nodes
     
@@ -188,16 +191,16 @@ class Test:
         cycles = list(nx.simple_cycles(G, length_bound=length_bound)) # TAKES TOO LONG TO RUN
         # if path:
         #     pickle.dump(cycles, path)
-        print('cycles found')
+        # print('cycles found')
 
-        print("cycles:", cycles)
+        # print("cycles:", cycles)
 
         # make the cycles into frozensets (immutable sets)
         old_cycles = set()
         for cycle in cycles:
             old_cycles.add(frozenset(cycle))
         
-        print("old_cycles:", old_cycles)
+        # print("old_cycles:", old_cycles)
 
         # removing subsets
         # new_cycles = old_cycles.copy()
@@ -235,15 +238,15 @@ class Test:
                             if to_cycle1 and to_cycle2:
                                     new_cycles.add(frozenset(cycle1.union(cycle2)))
                                     break
-            print(len(old_cycles), len(new_cycles))
+            # print(len(old_cycles), len(new_cycles))
             if new_cycles == old_cycles:
                 break
             else:
                 old_cycles = new_cycles.copy()
 
         cycles = new_cycles
-        print(cycles == old_cycles)
-        print("cycles:", cycles)
+        # print(cycles == old_cycles)
+        # print("cycles:", cycles)
 
         # for cycle in cycles:
         #     prnt_str = ''
@@ -262,11 +265,11 @@ class Test:
                     if node in cycle:
                         satisfies_prog_counter += 1
                         break
-            print(satisfies_prog_counter)
+            # print(satisfies_prog_counter)
             if satisfies_prog_counter == len(env_prog_dict):
                 prog_satisfying_cycles.append(cycle)
         
-        print("prog_satisfying_cycles:", prog_satisfying_cycles)
+        # print("prog_satisfying_cycles:", prog_satisfying_cycles)
 
         # Remove any cycles with the system leaving
         no_leave_cycles = []
@@ -286,7 +289,7 @@ class Test:
             if not cycle_left:
                 no_leave_cycles.append(cycle)
         
-        print("no_leave_cycles:", no_leave_cycles)
+        # print("no_leave_cycles:", no_leave_cycles)
         
         # Take the cycles that encompass the others
         # QUESTION: is this set even necessary?
@@ -300,7 +303,7 @@ class Test:
             if not is_subset:
                 largest_cycles.append(cycle)
         
-        print("largest_cycles:", largest_cycles)
+        # print("largest_cycles:", largest_cycles)
         
         return largest_cycles
     
@@ -312,7 +315,7 @@ class Test:
                 i += 1
             else:
                 break
-        print("curr_node: ", curr_node, ", i:", i, ", len(R): ", len(R))
+        # print("curr_node: ", curr_node, ", i:", i, ", len(R): ", len(R))
         assert curr_node in R[i] #, f"curr_node: {curr_node}, i: {i}, len(R): {len(R)}"
         return i
     
@@ -343,7 +346,7 @@ class Test:
         T[i] += 1 # added
 
         time_in_Ri = self.find_time_in_Ri(T, i)
-        print('i: ', i, ", time_in_Ri: ", time_in_Ri)
+        # print('i: ', i, ", time_in_Ri: ", time_in_Ri)
 
         metric = {}
 
@@ -351,7 +354,7 @@ class Test:
         for sys_suc in list(g.successors(env_node)):
             metric[sys_suc] = maximized_robustness[sys_suc] + closer_to_R0[sys_suc] * time_in_Ri * penalty
         
-        print("metric:", metric)
+        # print("metric:", metric)
         
         # find the key (node) in the metric dictionary that has the minimum metric
         # min_key = min(metric, key=lambda k: metric[k])
@@ -374,9 +377,9 @@ class Test:
         return big_lst
     
     def calculate_winning_sets(self, G, R0, possible_actions=None):
-        print("R0:", R0)
+        # print("R0:", R0)
         R0_env = {node for node in R0 if G.nodes[node]['shape'] == 'box'}
-        print("R0_env:", R0_env)
+        # print("R0_env:", R0_env)
 
         # calculate the "levels" from the env prog cycle outwards
         R = {}
